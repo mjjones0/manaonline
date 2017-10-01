@@ -65,7 +65,19 @@ GAME.Player.prototype.animate = function()
 		this.view.stop();
 	} else {
 		var newFrames;
+		var angle = Math.atan2(this.vy, this.vx) * GAME.RADIANSTOANGLE;
+		
+		if (angle > -45 && angle < 45) {
+			newFrames = this.walkRightFrames;
+		} else if (angle < -45 && angle > -135) {
+			newFrames = this.walkUpFrames;
+		} else if (angle < -135 || angle > 135) {
+			newFrames = this.walkLeftFrames;
+		} else if (angle < 135 && angle > 45) {
+			newFrames = this.walkDownFrames;
+		}
 	
+		/*
 		// right
 		if (this.vx > 0.01 && this.vy < 0.01) {
 			newFrames = this.walkRightFrames;
@@ -78,7 +90,7 @@ GAME.Player.prototype.animate = function()
 		// up
 		} else if (this.vx < 0.01 && this.vy < -0.01) {
 			newFrames = this.walkUpFrames;
-		}
+		}*/
 		
 		if (this.view.textures != newFrames) {
 			this.view.textures = newFrames;

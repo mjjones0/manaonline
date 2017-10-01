@@ -26,7 +26,8 @@ function load() {
 		"img/arrow_right.png",
 		"img/rabite_enemy.json",
 		"img/exit.png",
-		"img/blacksquare.jpg"
+		"img/blacksquare.jpg",
+		"img/mana_tree.png"
 	  ])
 	  .load(init);
 }
@@ -34,6 +35,8 @@ function load() {
 function init() {
 	if (  (typeof window.orientation !== "undefined") || ( navigator.userAgent.indexOf('IEMobile') !== -1 )  ) isMobile = true;
 	if (isMobile == false) PIXI.settings.SCALE_MODE = 1;
+	
+	//isMobile = true;
 	
 	game = new GAME.Engine();
 	

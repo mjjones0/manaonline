@@ -10,10 +10,12 @@ var leftPressed  = false,
 	downPressed  = false;
 var dirs = [];
 var OnScreenDPad = new Array(4);
+var OnScreenWheel;
 
 GAME.Input = function()
 {
-	setup_inputs();
+	setup_8dir_inputs();
+	//setup_inputs();
 	
 	if (isMobile) {
 		setup_buttons();
@@ -26,16 +28,18 @@ function onPointerMove(eventData)
 {
 	var pX = eventData.data.global.x;
 	var pY = eventData.data.global.y;
+	circlePadMove(pX, pY);
 	
-	var top_side = GAME.DPAD_Y_OFFSET - 48 - 24 - 48 - 10;
-	var right_side = GAME.DPAD_X_OFFSET + 48 + 24 + 48 + 10;
+	//var top_side = GAME.DPAD_Y_OFFSET - 48 - 24 - 48 - 10;
+	//var right_side = GAME.DPAD_X_OFFSET + 48 + 24 + 48 + 10;
 
 	// pseudo quad tree LUL
-	if (pY > top_side && pX < right_side) {
+	//if (pY > top_side && pX < right_side) {
 		// account for anchor for sprite test (removed on circle test)
-		pX += 24;
-		pY += 24;
+		//pX += 24;
+		//pY += 24;
 
+		/*
 		if (rectContains(OnScreenDPad[0], pX, pY) || circleContains(OnScreenDPad[0].x, OnScreenDPad[0].y - 24, 48, pX - 24, pY - 24)) { 
 			up.press();
 		} else { 
@@ -59,13 +63,17 @@ function onPointerMove(eventData)
 		} else { 
 			right.release(); 
 		}; 
-	}
+		*/
+	//}
 }
 
 function onPointerDown(eventData)
 {
 	var pX = eventData.data.global.x;
 	var pY = eventData.data.global.y;
+	circlePadMove(pX, pY);
+	
+	/*
 	var top_side = GAME.DPAD_Y_OFFSET - 48 - 24 - 48;
 	var right_side = GAME.DPAD_X_OFFSET + 48 + 24 + 48;
 	if (pY < top_side || pX > right_side) return; 
@@ -73,6 +81,46 @@ function onPointerDown(eventData)
 	if (circleContains(OnScreenDPad[1].x,      OnScreenDPad[1].y + 24, 48, pX, pY)) down.press(); 
 	if (circleContains(OnScreenDPad[2].x - 24, OnScreenDPad[2].y,      48, pX, pY)) left.press(); 
 	if (circleContains(OnScreenDPad[3].x + 24, OnScreenDPad[3].y,      48, pX, pY)) right.press(); 
+	*/
+}
+
+function circlePadMove(pX, pY) 
+{
+	if (rectContains(OnScreenWheel, pX, pY)) {
+		// calculate normal from center
+		var V = {x: pX - OnScreenWheel.center.x, y: pY - OnScreenWheel.center.y};
+		var angle = Math.atan2(V.y, V.x) * GAME.RADIANSTOANGLE;
+		//console.log(angle);
+		
+		right.release();
+		left.release();
+		down.release();
+		up.release();
+		
+		if (angle > -22.5 && angle < 22.5) {
+			right.press();
+		} else if (angle < -22.5 && angle > -67.5) {
+			right.press();
+			up.press();
+		} else if (angle < -67.5 && angle > -112.5) {
+			up.press();
+		} else if (angle < -112.5 && angle > -157.5) {
+			up.press();
+			left.press();
+		} else if (angle < -157.5 || angle > 157.5) {
+			left.press();
+		} else if (angle < 157.5 && angle > 112.5) {
+			left.press();
+			down.press();
+		} else if (angle < 112.5 && angle > 67.5) {
+			down.press();
+		} else if (angle < 67.5 && angle > 22.5) {
+			down.press();
+			right.press();
+		} else {
+			alert("YOU JUST GOT MEMED!");
+		}
+	}
 }
 
 GAME.Input.prototype.bindToContainer = function(container)
@@ -97,6 +145,104 @@ GAME.Input.prototype.release = function()
 	left.release();
 	down.release();
 	right.release();
+}
+
+function setup_8dir_inputs() {
+	left.press = function() {
+		leftPressed = true;
+		GAME.player.vx = -GAME.PLAYER_BASE.SPEED;
+		
+		if (upPressed) {
+			GAME.player.vx = -GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
+			GAME.player.vy = -GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
+		} else if (downPressed) {
+			GAME.player.vx = -GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
+			GAME.player.vy = GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
+		}
+	}
+
+	left.release = function() {
+		leftPressed = false;
+		GAME.player.vx = 0;
+		
+		if (upPressed) {
+			GAME.player.vy = -GAME.PLAYER_BASE.SPEED;
+		} else if (downPressed) {
+			GAME.player.vy = GAME.PLAYER_BASE.SPEED;
+		}
+	}
+	
+	right.press = function() {
+		rightPressed = true;
+		GAME.player.vx = GAME.PLAYER_BASE.SPEED;
+		
+		if (upPressed) {
+			GAME.player.vx = GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
+			GAME.player.vy = -GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
+		} else if (downPressed) {
+			GAME.player.vx = GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
+			GAME.player.vy = GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
+		}
+	}
+
+	right.release = function() {
+		rightPressed = false;
+		GAME.player.vx = 0;
+		
+		if (upPressed) {
+			GAME.player.vy = -GAME.PLAYER_BASE.SPEED;
+		} else if (downPressed) {
+			GAME.player.vy = GAME.PLAYER_BASE.SPEED;
+		}
+	}
+	
+	up.press = function() {
+		upPressed = true;
+		GAME.player.vy = -GAME.PLAYER_BASE.SPEED;
+		
+		if (leftPressed) {
+			GAME.player.vx = -GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
+			GAME.player.vy = -GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
+		} else if (rightPressed) {
+			GAME.player.vx = GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
+			GAME.player.vy = -GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
+		}
+	}
+	
+	up.release = function() {
+		upPressed = false;
+		GAME.player.vy = 0;
+		
+		if (leftPressed) {
+			GAME.player.vx = -GAME.PLAYER_BASE.SPEED;
+		} else if (rightPressed) {
+			GAME.player.vx = GAME.PLAYER_BASE.SPEED;
+		}
+	}
+	
+	down.press = function() {
+		downPressed = true;
+		GAME.player.vy = GAME.PLAYER_BASE.SPEED;
+		
+		if (leftPressed) {
+			GAME.player.vx = -GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
+			GAME.player.vy = GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
+		} else if (rightPressed) {
+			GAME.player.vx = GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
+			GAME.player.vy = GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
+		}
+	}
+	
+	down.release = function() {
+		downPressed = false;
+		GAME.player.vy = 0;
+		
+		if (leftPressed) {
+			GAME.player.vx = -GAME.PLAYER_BASE.SPEED;
+		} else if (rightPressed) {
+			GAME.player.vx = GAME.PLAYER_BASE.SPEED;
+		}
+	}
 }
 
 function setup_inputs() {
@@ -177,6 +323,7 @@ function setup_inputs() {
 }
 
 function setup_buttons() {
+	/*
 	OnScreenDPad[0] = new PIXI.Sprite(resources["img/arrow_up.png"].texture);
 	OnScreenDPad[0].x = ( GAME.DPAD_X_OFFSET );
 	OnScreenDPad[0].y = ( GAME.DPAD_Y_OFFSET - 48 );
@@ -198,6 +345,14 @@ function setup_buttons() {
 		OnScreenDPad[i].interactive = true;
 		OnScreenDPad[i].buttonMode = true;
 	}
+	*/
+	
+	OnScreenWheel = new PIXI.Sprite(resources["img/mana_tree.png"].texture);
+	OnScreenWheel.x = 0;
+	OnScreenWheel.y = GAME.BASEHEIGHT - OnScreenWheel.height;
+	OnScreenWheel.interactive = true;
+	OnScreenWheel.buttonMode = true;
+	OnScreenWheel.center = {x: OnScreenWheel.width / 2, y: GAME.BASEHEIGHT - OnScreenWheel.height / 2};
 }
 
 

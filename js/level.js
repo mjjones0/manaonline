@@ -70,7 +70,7 @@ GAME.Level.prototype.load = function(name, spawnX, spawnY)
 		height: this.data.BG_HEIGHT
     };
 	
-	GAME.audio.playMusic(this.song, true, 0.5);
+	GAME.audio.playMusic(this.song, true, 0.3);
 	
 	this.engine.view.createScene();
 }
@@ -144,9 +144,9 @@ GAME.Level.prototype.moveAndCollidePlayerX = function()
 			} else {
 				var playerUnitDir = GAME.player.vx < 0 ? -1 : 1;
 				var depth = axis_aligned_intersection_depth('x', GAME.player.bounds, this.monsters[i].bounds);
-				GAME.player.move(-1 * playerUnitDir * depth, 0);
-				GAME.player.move(playerUnitDir, 0);
-				this.monsters[i].move(playerUnitDir, 0);
+				//GAME.player.move(-1 * playerUnitDir * depth, 0);
+				//GAME.player.move(playerUnitDir, 0);
+				this.monsters[i].move(playerUnitDir * depth, 0);
 				
 				// if we push them into a block, however, undo everything
 				for (var j = 0; j < this.inanimates.length; ++j) {
@@ -196,9 +196,11 @@ GAME.Level.prototype.moveAndCollidePlayerY = function()
 			} else {
 				var playerUnitDir = GAME.player.vy < 0 ? -1 : 1;
 				var depth = axis_aligned_intersection_depth('y', GAME.player.bounds, this.monsters[i].bounds);
-				GAME.player.move(0, -1 * playerUnitDir * depth);
-				GAME.player.move(0, playerUnitDir);
-				this.monsters[i].move(0, playerUnitDir);
+				
+				//GAME.player.move(0, -1 * playerUnitDir * depth);
+				//GAME.player.move(0, playerUnitDir);
+				
+				this.monsters[i].move(0, playerUnitDir * depth);
 				
 				// if we push them into a block, however, undo everything
 				for (var j = 0; j < this.inanimates.length; ++j) {
