@@ -65,32 +65,18 @@ GAME.Player.prototype.animate = function()
 		this.view.stop();
 	} else {
 		var newFrames;
-		var angle = Math.atan2(this.vy, this.vx) * GAME.RADIANSTOANGLE;
 		
-		if (angle > -45 && angle < 45) {
-			newFrames = this.walkRightFrames;
-		} else if (angle < -45 && angle > -135) {
+		if (GAME.dirs[0] == up) {
 			newFrames = this.walkUpFrames;
-		} else if (angle < -135 || angle > 135) {
-			newFrames = this.walkLeftFrames;
-		} else if (angle < 135 && angle > 45) {
+		} else if (GAME.dirs[0] == down) {
 			newFrames = this.walkDownFrames;
+		} else if (GAME.dirs[0] == left) {
+			newFrames = this.walkLeftFrames;
+		} else if (GAME.dirs[0] == right) {
+			newFrames = this.walkRightFrames;
+		} else {
+			alert("YOU JUST GOT MEMED");
 		}
-	
-		/*
-		// right
-		if (this.vx > 0.01 && this.vy < 0.01) {
-			newFrames = this.walkRightFrames;
-		// down
-		} else if (this.vx < 0.01 && this.vy > 0.01) {
-			newFrames = this.walkDownFrames;
-		// left
-		} else if (this.vx < -0.01 && this.vy < 0.01) {
-			newFrames = this.walkLeftFrames;
-		// up
-		} else if (this.vx < 0.01 && this.vy < -0.01) {
-			newFrames = this.walkUpFrames;
-		}*/
 		
 		if (this.view.textures != newFrames) {
 			this.view.textures = newFrames;
@@ -101,12 +87,90 @@ GAME.Player.prototype.animate = function()
 	}
 }
 
+GAME.Player.prototype.handleInput = function()
+{
+	var top = GAME.dirs.length - 1;
+	var twoInputs = GAME.dirs.length > 1;
+
+	if (GAME.dirs.length) {
+		if (GAME.dirs[top] == up) {
+			if (twoInputs) {
+				if (GAME.dirs[top - 1] == left) {
+					this.vx = -GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
+					this.vy = -GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
+				} else if (GAME.dirs[top - 1] == right) {
+					this.vx = GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
+					this.vy = -GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
+				} else {
+					this.vy = -GAME.PLAYER_BASE.SPEED;
+					this.vx = 0;
+				}
+			} else {
+				this.vy = -GAME.PLAYER_BASE.SPEED;
+				this.vx = 0;
+			}
+		} else if (GAME.dirs[top] == left) {
+			if (twoInputs) {
+				if (GAME.dirs[top - 1] == down) {
+					this.vx = -GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
+					this.vy = GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
+				} else if (GAME.dirs[top - 1] == up) {
+					this.vx = -GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
+					this.vy = -GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
+				} else {
+					this.vx = -GAME.PLAYER_BASE.SPEED;
+					this.vy = 0;
+				}
+			} else {
+				this.vx = -GAME.PLAYER_BASE.SPEED;
+				this.vy = 0;
+			}
+		} else if (GAME.dirs[top] == down) {
+			if (twoInputs) {
+				if (GAME.dirs[top - 1] == left) {
+					this.vx = -GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
+					this.vy = GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
+				} else if (GAME.dirs[top - 1] == right) {
+					this.vx = GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
+					this.vy = GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
+				} else {
+					this.vy = GAME.PLAYER_BASE.SPEED;
+					this.vx = 0;
+				}
+			} else {
+				this.vy = GAME.PLAYER_BASE.SPEED;
+				this.vx = 0;
+			}
+		} else if (GAME.dirs[top] == right) {
+			if (twoInputs) {
+				if (GAME.dirs[top - 1] == down) {
+					this.vx = GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
+					this.vy = GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
+				} else if (GAME.dirs[top - 1] == up) {
+					this.vx = GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
+					this.vy = -GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
+				} else {
+					this.vx = GAME.PLAYER_BASE.SPEED;
+					this.vy = 0;
+				}
+			} else {
+				this.vx = GAME.PLAYER_BASE.SPEED;
+				this.vy = 0;
+			}
+		}
+	} else {
+		this.vx = 0;
+		this.vy = 0;
+	}
+}
+
 GAME.Player.prototype.update = function()
 {
 	if (this.movementDisabled) {
 		return;
 	}
 	
+	this.handleInput();
 	this.animate();
 	//this.move(this.vx, this.vy);
 }

@@ -8,7 +8,7 @@ var leftPressed  = false,
 	rightPressed = false,
 	upPressed    = false,
 	downPressed  = false;
-var dirs = [];
+GAME.dirs = [];
 var OnScreenDPad = new Array(4);
 var OnScreenWheel;
 
@@ -120,6 +120,11 @@ function circlePadMove(pX, pY)
 		} else {
 			alert("YOU JUST GOT MEMED!");
 		}
+	} else {
+		up.release();
+		down.release();
+		left.release();
+		right.release();
 	}
 }
 
@@ -149,30 +154,36 @@ GAME.Input.prototype.release = function()
 
 function setup_8dir_inputs() {
 	left.press = function() {
-		leftPressed = true;
-		GAME.player.vx = -GAME.PLAYER_BASE.SPEED;
+		//leftPressed = true;
+		GAME.dirs.push(left);
 		
+		
+		/*
+		GAME.player.vx = -GAME.PLAYER_BASE.SPEED;
 		if (upPressed) {
 			GAME.player.vx = -GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
 			GAME.player.vy = -GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
 		} else if (downPressed) {
 			GAME.player.vx = -GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
 			GAME.player.vy = GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
-		}
+		}*/
 	}
 
 	left.release = function() {
-		leftPressed = false;
+		//leftPressed = false;
+		GAME.dirs.remove(left);
+		/*
 		GAME.player.vx = 0;
-		
 		if (upPressed) {
 			GAME.player.vy = -GAME.PLAYER_BASE.SPEED;
 		} else if (downPressed) {
 			GAME.player.vy = GAME.PLAYER_BASE.SPEED;
-		}
+		}*/
 	}
 	
 	right.press = function() {
+		GAME.dirs.push(right);
+		/*
 		rightPressed = true;
 		GAME.player.vx = GAME.PLAYER_BASE.SPEED;
 		
@@ -182,10 +193,12 @@ function setup_8dir_inputs() {
 		} else if (downPressed) {
 			GAME.player.vx = GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
 			GAME.player.vy = GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
-		}
+		}*/
 	}
 
 	right.release = function() {
+		GAME.dirs.remove(right);
+		/*
 		rightPressed = false;
 		GAME.player.vx = 0;
 		
@@ -193,23 +206,26 @@ function setup_8dir_inputs() {
 			GAME.player.vy = -GAME.PLAYER_BASE.SPEED;
 		} else if (downPressed) {
 			GAME.player.vy = GAME.PLAYER_BASE.SPEED;
-		}
+		}*/
 	}
 	
 	up.press = function() {
+		GAME.dirs.push(up);
+		/*
 		upPressed = true;
 		GAME.player.vy = -GAME.PLAYER_BASE.SPEED;
-		
 		if (leftPressed) {
 			GAME.player.vx = -GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
 			GAME.player.vy = -GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
 		} else if (rightPressed) {
 			GAME.player.vx = GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
 			GAME.player.vy = -GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
-		}
+		}*/
 	}
 	
 	up.release = function() {
+		GAME.dirs.remove(up);
+		/*
 		upPressed = false;
 		GAME.player.vy = 0;
 		
@@ -217,31 +233,33 @@ function setup_8dir_inputs() {
 			GAME.player.vx = -GAME.PLAYER_BASE.SPEED;
 		} else if (rightPressed) {
 			GAME.player.vx = GAME.PLAYER_BASE.SPEED;
-		}
+		}*/
 	}
 	
 	down.press = function() {
+		GAME.dirs.push(down);
+		/*
 		downPressed = true;
 		GAME.player.vy = GAME.PLAYER_BASE.SPEED;
-		
 		if (leftPressed) {
 			GAME.player.vx = -GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
 			GAME.player.vy = GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
 		} else if (rightPressed) {
 			GAME.player.vx = GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
 			GAME.player.vy = GAME.PLAYER_BASE.SPEED * GAME.ROOTTWOOVERTWO;
-		}
+		}*/
 	}
 	
 	down.release = function() {
+		GAME.dirs.remove(down);
+		/*
 		downPressed = false;
 		GAME.player.vy = 0;
-		
 		if (leftPressed) {
 			GAME.player.vx = -GAME.PLAYER_BASE.SPEED;
 		} else if (rightPressed) {
 			GAME.player.vx = GAME.PLAYER_BASE.SPEED;
-		}
+		}*/
 	}
 }
 
