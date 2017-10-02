@@ -3,11 +3,15 @@
 var left  = keyboard(37),
 	up    = keyboard(38),
 	right = keyboard(39),
-	down  = keyboard(40);
+	down  = keyboard(40),
+	z_button = keyboard(90),
+	x_button = keyboard(88);
 var leftPressed  = false,
 	rightPressed = false,
 	upPressed    = false,
-	downPressed  = false;
+	downPressed  = false,
+	zPressed = false,
+	xPressed = false;
 GAME.dirs = [];
 var OnScreenDPad = new Array(4);
 var OnScreenWheel;
@@ -150,6 +154,8 @@ GAME.Input.prototype.release = function()
 	left.release();
 	down.release();
 	right.release();
+	z_button.release();
+	x_button.release();
 }
 
 function setup_8dir_inputs() {
@@ -261,6 +267,11 @@ function setup_8dir_inputs() {
 			GAME.player.vx = GAME.PLAYER_BASE.SPEED;
 		}*/
 	}
+	
+	z_button.press = function () { zPressed = true; }
+	z_button.release = function () { zPressed = false; }
+	x_button.press = function () { xPressed = true; }
+	x_button.release = function () { xPressed = false; }
 }
 
 function setup_inputs() {

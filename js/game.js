@@ -24,10 +24,11 @@ function load() {
 		"img/arrow_down.png",
 		"img/arrow_left.png",
 		"img/arrow_right.png",
-		"img/rabite_enemy.json",
 		"img/exit.png",
 		"img/blacksquare.jpg",
-		"img/mana_tree.png"
+		"img/mana_tree.png",
+		"img/duran.json",
+		"img/rabite.json"
 	  ])
 	  .load(init);
 }

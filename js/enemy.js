@@ -28,6 +28,19 @@ GAME.Enemy = function(name)
 	this.width = data.WIDTH;
 	this.height = data.HEIGHT;
 	
+	this.frames = [];
+	
+	// get animation frames from data
+	for (var key in data.FRAMES) {
+		if (data.FRAMES.hasOwnProperty(key)) {
+			this.frames[key] = [];
+			for (var i = 0; i < data.FRAMES[key].length; ++i) {
+				this.frames[key].push(PIXI.Texture.fromFrame(data.FRAMES[key][i] + ".png"));
+			}
+		}
+	}
+	
+	/*
 	this.moveDownFrames = [];
 	this.moveLeftFrames = [];
 	this.moveUpFrames = [];
@@ -57,11 +70,13 @@ GAME.Enemy = function(name)
 		if (PIXI.Texture.fromFrame(this.name + "_get_hit_" + i + ".png")) {
 			this.getHitFrames.push(PIXI.Texture.fromFrame(this.name + "_get_hit_" + i + ".png"));
 		}
-	}
+	}*/
 	
-	this.currentAnimation = new PIXI.extras.AnimatedSprite(this.moveDownFrames);
+	this.currentAnimation = new PIXI.extras.AnimatedSprite(this.frames[data.FRAME_DEFAULT]);
 	this.currentAnimation.animationSpeed = 0.08;
 	this.view = this.currentAnimation;
+	this.view.anchor.x = 0.5;
+	this.view.anchor.y = 0.5;
 	this.bounds = {x: this.position.x, y: this.position.y, width: this.width, height: this.height};
 }
 
@@ -84,6 +99,12 @@ GAME.Enemy.prototype.setPosition = function(x, y)
 	this.position.y = y;
 	this.view.position.x = this.position.x;
 	this.view.position.y = this.position.y;
+}
+
+GAME.Enemy.prototype.stop = function()
+{
+	this.vx = 0;
+	this.vy = 0;
 }
 
 GAME.Enemy.prototype.moveUp = function()
@@ -114,21 +135,34 @@ GAME.Enemy.prototype.animate = function()
 {
 	if (this.vx < 0.01 && this.vy < 0.01 && this.vx > -0.01 && this.vy > -0.01) {
 		this.view.stop();
+		
+		if (this.view.textures == this.frames['move_left']) {
+			this.view.textures = this.frames['still_left'];
+		} else if (this.view.textures == this.frames['move_down']) {
+			this.view.textures = this.frames['still_down'];
+		} else if (this.view.textures == this.frames['move_up']) {
+			this.view.textures = this.frames['still_up'];
+		}
 	} else {
 		var newFrames;
-	
-		// right
-		if (this.vx > 0.01 && this.vy < 0.01) {
-			newFrames = this.moveRightFrames;
-		// down
-		} else if (this.vx < 0.01 && this.vy > 0.01) {
-			newFrames = this.moveDownFrames;
+		var angle = Math.atan2(this.vy, this.vx) * GAME.RADIANSTOANGLE;
+		
+		if (angle > -45 && angle < 45) {
+			newFrames = this.frames['move_left'];
+			this.view.scale.x = -1;
+		} else if (angle < -45 && angle > -135) {
+			newFrames = this.frames['move_up'];
+			this.view.scale.x = 1;
 		// left
-		} else if (this.vx < -0.01 && this.vy < 0.01) {
-			newFrames = this.moveLeftFrames;
-		// up
-		} else if (this.vx < 0.01 && this.vy < -0.01) {
-			newFrames = this.moveUpFrames;
+		} else if (angle < -135 || angle > 135) {
+			newFrames = this.frames['move_left'];
+			this.view.scale.x = 1;
+		} else if (angle < 135 && angle > 45) {
+			newFrames = this.frames['move_down'];
+			this.view.scale.x = 1;
+		} else {
+			console.log(angle);
+			alert("ASPLODE");
 		}
 		
 		if (this.view.textures != newFrames) {
@@ -165,15 +199,18 @@ GAME.Enemy.prototype.move = function(x, y)
 	this.view.position.x = this.position.x;
 	this.view.position.y = this.position.y;
 	
-	this.bounds.x = this.position.x;
-	this.bounds.y = this.position.y;
+	this.bounds.x = this.position.x - this.width / 2;
+	this.bounds.y = this.position.y - this.height / 2;
 }
 
 GAME.Enemy.prototype.behave = function() 
 {
 	if (this.moveFramesLeft == 0) {
 		this.moveFramesLeft = randomInt(100, 200);
-		this.moveDirection = randomInt(1, 4);
+		this.moveDirection = randomInt(1, 7);
+		if (this.moveDirection > 4) {
+			this.moveFramesLeft = 60;
+		}
 	} else {
 		--this.moveFramesLeft;
 	}
@@ -186,6 +223,8 @@ GAME.Enemy.prototype.behave = function()
 		this.moveDown();
 	} else if (this.moveDirection == 4) {
 		this.moveRight();
+	} else {
+		this.stop();
 	}
 }
 

@@ -125,7 +125,7 @@ GAME.Level.prototype.moveAndCollidePlayerX = function()
 	// move player X -> if we collide into a block, undo
 	GAME.player.moveX();
 	for (var i = 0; i < this.inanimates.length; ++i) {
-		if (hitTestRectangleRote(GAME.player.position.x, GAME.player.position.y, GAME.player.width, GAME.player.height, 
+		if (hitTestRectangleRote(GAME.player.bounds.x, GAME.player.bounds.y, GAME.player.bounds.width, GAME.player.bounds.height, 
 							 this.inanimates[i].x, this.inanimates[i].y, this.inanimates[i].width, this.inanimates[i].height)) {
 			GAME.player.backout();
 			return;
@@ -150,7 +150,7 @@ GAME.Level.prototype.moveAndCollidePlayerX = function()
 				
 				// if we push them into a block, however, undo everything
 				for (var j = 0; j < this.inanimates.length; ++j) {
-					if (hitTestRectangleRote(this.monsters[i].position.x, this.monsters[i].position.y, this.monsters[i].width, this.monsters[i].height, 
+					if (hitTestRectangleRote(this.monsters[i].bounds.x, this.monsters[i].bounds.y, this.monsters[i].bounds.width, this.monsters[i].bounds.height, 
 										 this.inanimates[j].x, this.inanimates[j].y, this.inanimates[j].width, this.inanimates[j].height)) {
 						GAME.player.backout();
 						this.monsters[i].backout();
@@ -177,7 +177,7 @@ GAME.Level.prototype.moveAndCollidePlayerY = function()
 	GAME.player.moveY();
 	// if we collide with a block, undo and return
 	for (var i = 0; i < this.inanimates.length; ++i) {
-		if (hitTestRectangleRote(GAME.player.position.x, GAME.player.position.y, GAME.player.width, GAME.player.height, 
+		if (hitTestRectangleRote(GAME.player.bounds.x, GAME.player.bounds.y, GAME.player.bounds.width, GAME.player.bounds.height, 
 							 this.inanimates[i].x, this.inanimates[i].y, this.inanimates[i].width, this.inanimates[i].height)) {
 			GAME.player.backout();
 			return;
@@ -204,7 +204,7 @@ GAME.Level.prototype.moveAndCollidePlayerY = function()
 				
 				// if we push them into a block, however, undo everything
 				for (var j = 0; j < this.inanimates.length; ++j) {
-					if (hitTestRectangleRote(this.monsters[i].position.x, this.monsters[i].position.y, this.monsters[i].width, this.monsters[i].height, 
+					if (hitTestRectangleRote(this.monsters[i].bounds.x, this.monsters[i].bounds.y, this.monsters[i].bounds.width, this.monsters[i].bounds.height, 
 										 this.inanimates[j].x, this.inanimates[j].y, this.inanimates[j].width, this.inanimates[j].height)) {
 						GAME.player.backout();
 						this.monsters[i].backout();
@@ -248,7 +248,7 @@ GAME.Level.prototype.moveAndCollideMonsters = function()
 		
 		// if we hit an inanimate, undo and change direction
 		for (var j = 0; j < this.inanimates.length; ++j) {
-			if (hitTestRectangleRote(this.monsters[i].position.x, this.monsters[i].position.y, this.monsters[i].width, this.monsters[i].height, 
+			if (hitTestRectangleRote(this.monsters[i].bounds.x, this.monsters[i].bounds.y, this.monsters[i].bounds.width, this.monsters[i].bounds.height, 
 								 this.inanimates[j].x, this.inanimates[j].y, this.inanimates[j].width, this.inanimates[j].height)) {
 				this.monsters[i].backout();
 				this.monsters[i].changeDirection();
@@ -265,7 +265,7 @@ GAME.Level.prototype.collideWithExit = function()
 		var exitRect = { x: exit.x, y: exit.y, width: exit.width, height: exit.height };
 	
 		if (hitTestRectangle(GAME.player.bounds, exitRect) && 
-			rectContains(exitRect, GAME.player.position.x + GAME.player.width / 2, GAME.player.position.y + GAME.player.height * 0.75)) {
+			rectContains(exitRect, GAME.player.bounds.x + GAME.player.bounds.width / 2, GAME.player.bounds.y + GAME.player.bounds.height * 0.75)) {
 			
 			// check if cost is met
 			var costMet = false;

@@ -15,26 +15,26 @@ function contain(sprite, container) {
     var collision = undefined;
 
     //Left
-    if (sprite.position.x < container.x) {
-		sprite.move(container.x - sprite.position.x, 0);
+    if (sprite.bounds.x < container.x) {
+		sprite.move(container.x - sprite.bounds.x, 0);
         collision = "left";
     }
 
     //Top
-    if (sprite.position.y < container.y) {
-		sprite.move(0, container.y - sprite.position.y);
+    if (sprite.bounds.y < container.y) {
+		sprite.move(0, container.y - sprite.bounds.y);
         collision = "top";
     }
 
     //Right
-    if (sprite.position.x + sprite.width > container.width) {
-		sprite.move(-1 * (sprite.position.x + sprite.width - container.width), 0);
+    if (sprite.bounds.x + sprite.width > container.width) {
+		sprite.move(-1 * (sprite.bounds.x + sprite.width - container.width), 0);
         collision = "right";
     }
 
     //Bottom
-    if (sprite.position.y + sprite.height > container.height) {
-		sprite.move(0, -1 * (sprite.position.y + sprite.height - container.height));
+    if (sprite.bounds.y + sprite.height > container.height) {
+		sprite.move(0, -1 * (sprite.bounds.y + sprite.height - container.height));
         collision = "bottom";
     }
 
@@ -48,22 +48,22 @@ function contain_pixels(sprite, container) {
 
 function out_of_bounds(sprite, container) {
     //Left
-    if (sprite.position.x < container.x) {
+    if (sprite.bounds.x < container.x) {
 		return true;
     }
 
     //Top
-    if (sprite.position.y < container.y) {
+    if (sprite.bounds.y < container.y) {
 		return true;
     }
 
     //Right
-    if (sprite.position.x + sprite.width > container.width) {
+    if (sprite.bounds.x + sprite.width > container.width) {
 		return true;
     }
 
     //Bottom
-    if (sprite.position.y + sprite.height > container.height) {
+    if (sprite.bounds.y + sprite.height > container.height) {
         return true;
     }
 

@@ -81,25 +81,25 @@ GAME.View.prototype.moveCamera = function()
 	this.gameScene.scale.x = GAME.SCALE_X;
 	this.gameScene.scale.y = GAME.SCALE_Y;
 	
-	var fovX = scaledWidthHalved - GAME.player.width / 2;
-	var fovY = scaledHeightHalved - GAME.player.height / 2;
+	var fovX = scaledWidthHalved;
+	var fovY = scaledHeightHalved;
 	
 	if (GAME.player.position.x >= fovX &&
-		GAME.player.position.x <= stageWidth - fovX - GAME.player.width) {
+		GAME.player.position.x <= stageWidth - fovX) {
 		this.gameScene.position.x = (fovX - GAME.player.position.x) * GAME.SCALE_X;
 	} else if (GAME.player.position.x < fovX) {
 		this.gameScene.position.x = 0;
 	} else {
-		this.gameScene.position.x = (fovX - (stageWidth - fovX - GAME.player.width)) * GAME.SCALE_X; 
+		this.gameScene.position.x = (fovX - (stageWidth - fovX)) * GAME.SCALE_X; 
 	}
 	
 	if (GAME.player.position.y >= fovY &&
-		GAME.player.position.y <= stageHeight - fovY - GAME.player.height) {
+		GAME.player.position.y <= stageHeight - fovY) {
 		this.gameScene.position.y = (fovY - GAME.player.position.y) * GAME.SCALE_Y;
 	} else if (GAME.player.position.y < fovY) {
 		this.gameScene.position.y = 0;
 	} else {
-		this.gameScene.position.y = (fovY - (stageHeight - fovY - GAME.player.height)) * GAME.SCALE_Y;
+		this.gameScene.position.y = (fovY - (stageHeight - fovY)) * GAME.SCALE_Y;
 	}
 }
 

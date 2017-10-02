@@ -33,6 +33,8 @@ GAME.PLAYER_BASE =
 	EXP: 0,
 	EXP_REQUIRED: 10,
 	SPEED: 3.0,
+	WALK_SPEED: 1.5,
+	RUN_SPEED: 3.5,
 	ATTACK: 7,
 	DEFENSE: 1,
 	WIDTH: 25,
@@ -50,8 +52,8 @@ GAME.MONSTERS['rabite'] =
 	SPEED: 0.75,
 	ATTACK: 0,
 	DEFENSE: 1,
-	WIDTH: 30,
-	HEIGHT: 27,
+	WIDTH: 22,
+	HEIGHT: 22,
 	HIT_FRAMES: 2,
 	MOVE_FRAMES: 7,
 	LOOT: [
@@ -70,7 +72,20 @@ GAME.MONSTERS['rabite'] =
 			RATE: 0.5,
 			QTY: 1
 		}
-	]
+	],
+	FRAMES: {
+		attack_down : ['rabite_attack_0', 'rabite_attack_1', 'rabite_attack_2'],
+		attack_left : ['rabite_attack_6', 'rabite_attack_7', 'rabite_attack_8'],
+		attack_up : ['rabite_attack_3', 'rabite_attack_4', 'rabite_attack_5'],
+		hit : ['rabite_hit_0'],
+		move_down : ['rabite_move_0', 'rabite_move_1', 'rabite_move_2'],
+		move_left : ['rabite_move_3', 'rabite_move_4', 'rabite_move_5'],
+		move_up : ['rabite_move_6', 'rabite_move_7', 'rabite_move_8'],
+		still_down : ['rabite_attack_2'],
+		still_left : ['rabite_attack_8'],
+		still_up : ['rabite_attack_5']
+	},
+	FRAME_DEFAULT: 'move_down'
 };
 
 GAME.LEVELS['demo_room_0'] = 
@@ -84,7 +99,7 @@ GAME.LEVELS['demo_room_0'] =
 		COST: 0,
 		COMBAT_LOCKED: true,
 		DEST_X: 50,
-		DEST_Y: 290,
+		DEST_Y: 300,
 		ACTIVE: true,
 		TEXTURE: "img/exit.png"
 	},
@@ -113,7 +128,7 @@ GAME.LEVELS['demo_room_0'] =
 	},
 	{
 		X: 650,
-		Y: 180,
+		Y: 170,
 		TYPE: GAME.INANIMATE,
 		TEXTURE: "img/bush.png"
 	},
@@ -146,8 +161,8 @@ GAME.LEVELS['demo_room_1'] =
 		NEXT: 'demo_room_0',
 		COST: 0,
 		COMBAT_LOCKED: true,
-		DEST_X: 705,
-		DEST_Y: 290,
+		DEST_X: 725,
+		DEST_Y: 300,
 		ACTIVE: true,
 		TEXTURE: "img/exit.png"
 	},
@@ -219,7 +234,7 @@ GAME.LEVELS['demo_room_1'] =
 	},
 	{
 		X: 5,
-		Y: 180,
+		Y: 170,
 		TYPE: GAME.INANIMATE,
 		TEXTURE: "img/bush.png"
 	},
