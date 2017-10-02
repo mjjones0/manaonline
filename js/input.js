@@ -16,6 +16,7 @@ GAME.dirs = [];
 var OnScreenDPad = new Array(4);
 var OnScreenWheel;
 var OnScreenRun;
+var OnScreenAttack;
 var OnScreenZ;
 var OnScreenX;
 
@@ -168,6 +169,18 @@ function setup_buttons() {
 	});
 	OnScreenRun.on('pointerup', function () {
 		zPressed = false;
+	});
+	
+	OnScreenAttack = new PIXI.Sprite(resources["img/attack_icon.png"].texture);
+	OnScreenAttack.x = OnScreenRun.x - OnScreenAttack.width - OnScreenAttack.width / 4;
+	OnScreenAttack.y = GAME.BASEHEIGHT - OnScreenAttack.height - OnScreenAttack.height / 4;
+	OnScreenAttack.interactive = true;
+	OnScreenAttack.buttonMode = true;
+	OnScreenAttack.on('pointerdown', function () {
+		xPressed = true;
+	});
+	OnScreenAttack.on('pointerup', function () {
+		xPressed = false;
 	});
 }
 

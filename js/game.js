@@ -33,7 +33,8 @@ function load() {
 		"img/keyboard_z.png",
 		"img/keyboard_x.png",
 		"img/keyboard_z_pressed.png",
-		"img/keyboard_x_pressed.png"
+		"img/keyboard_x_pressed.png",
+		"img/attack_icon.png"
 	  ])
 	  .load(init);
 }

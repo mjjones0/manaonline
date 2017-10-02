@@ -34,10 +34,9 @@ GAME.View.prototype.clearScene = function()
 		this.gameScene.removeChild(GAME.level.inanimates[i]);
 	}
 	if (isMobile) {
-		for (var i = 0; i < OnScreenDPad.length; ++i) {
-			this.hud.removeChild(OnScreenDPad[i]);
-		}
-		
+		this.hud.removeChild(OnScreenWheel);
+		this.hud.removeChild(OnScreenRun);
+		this.hud.removeChild(OnScreenAttack);
 		this.hud.interactive = false;
 	} else {
 		this.hud.removeChild(OnScreenZ);
@@ -61,6 +60,7 @@ GAME.View.prototype.createScene = function()
 	if (isMobile) {
 		this.hud.addChild(OnScreenWheel);
 		this.hud.addChild(OnScreenRun);
+		this.hud.addChild(OnScreenAttack);
 		this.hud.interactive = true;
 	} else {
 		this.hud.addChild(OnScreenZ);
