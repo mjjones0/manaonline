@@ -29,7 +29,11 @@ function load() {
 		"img/mana_tree.png",
 		"img/duran.json",
 		"img/rabite.json",
-		"img/run_icon.png"
+		"img/run_icon.png",
+		"img/keyboard_z.png",
+		"img/keyboard_x.png",
+		"img/keyboard_z_pressed.png",
+		"img/keyboard_x_pressed.png"
 	  ])
 	  .load(init);
 }

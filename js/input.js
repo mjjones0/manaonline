@@ -16,6 +16,8 @@ GAME.dirs = [];
 var OnScreenDPad = new Array(4);
 var OnScreenWheel;
 var OnScreenRun;
+var OnScreenZ;
+var OnScreenX;
 
 GAME.Input = function()
 {
@@ -23,6 +25,8 @@ GAME.Input = function()
 	
 	if (isMobile) {
 		setup_buttons();
+	} else {
+		setup_keyboard_buttons();
 	}
 }
 
@@ -70,6 +74,14 @@ function circlePadMove(pX, pY)
 	}
 }
 
+GAME.Input.prototype.release = function()
+{
+	up.release();
+	left.release();
+	down.release();
+	right.release();
+}
+
 function setup_inputs() {
 	left.press = function() {
 		GAME.dirs.push(left);
@@ -103,10 +115,22 @@ function setup_inputs() {
 		GAME.dirs.remove(down);
 	}
 	
-	z_button.press = function () { zPressed = true; }
-	z_button.release = function () { zPressed = false; }
-	x_button.press = function () { xPressed = true; }
-	x_button.release = function () { xPressed = false; }
+	z_button.press = function () { 
+		zPressed = true;
+		OnScreenZ.texture = resources["img/keyboard_z_pressed.png"].texture;
+	}
+	z_button.release = function () { 
+		zPressed = false; 
+		OnScreenZ.texture = resources["img/keyboard_z.png"].texture;
+	}
+	x_button.press = function () { 
+		xPressed = true; 
+		OnScreenX.texture = resources["img/keyboard_x_pressed.png"].texture;
+	}
+	x_button.release = function () { 
+		xPressed = false; 
+		OnScreenX.texture = resources["img/keyboard_x.png"].texture;
+	}
 }
 
 function setup_buttons() {
@@ -145,6 +169,16 @@ function setup_buttons() {
 	OnScreenRun.on('pointerup', function () {
 		zPressed = false;
 	});
+}
+
+function setup_keyboard_buttons() {
+	OnScreenZ = new PIXI.Sprite(resources["img/keyboard_z.png"].texture);
+	OnScreenZ.x = 6;
+	OnScreenZ.y = GAME.BASEHEIGHT - OnScreenZ.height - 6;
+	
+	OnScreenX = new PIXI.Sprite(resources["img/keyboard_x.png"].texture);
+	OnScreenX.x = 6 + 2 + OnScreenZ.width;
+	OnScreenX.y = GAME.BASEHEIGHT - OnScreenX.height - 6;
 }
 
 

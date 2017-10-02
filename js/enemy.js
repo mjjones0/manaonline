@@ -11,6 +11,9 @@ GAME.Enemy = function(name)
 	this.vx = 0;
 	this.vy = 0;
 	
+	this.isHit = false;
+	this.hitTime = 0.0;
+	
 	this.name = data.NAME;
 	this.exp = data.EXP;
 	this.health = data.HEALTH;
@@ -20,6 +23,7 @@ GAME.Enemy = function(name)
 	this.attack = data.ATTACK;
 	this.defense = data.DEFENSE;
 	this.heavy = data.HEAVY;
+	this.stunDuration = data.STUN_DURATION;
 	
 	this.damage = 0;
 	this.moveFramesLeft = 0;
@@ -100,8 +104,23 @@ GAME.Enemy.prototype.moveLeft = function()
 	this.vx = -this.speed;
 }
 
+GAME.Enemy.prototype.getHit = function()
+{
+	if (!this.isHit && this.stunDuration > 0.01) {
+		if ('hit' in this.frames) {
+			this.view.textures = this.frames['hit'];
+		}
+		this.isHit = true;
+		this.hitTime = 0.0;
+		this.vx = 0;
+		this.vy = 0;
+	}
+}
+
 GAME.Enemy.prototype.animate = function() 
 {
+	if (this.isHit) return;
+
 	if (this.vx < 0.01 && this.vy < 0.01 && this.vx > -0.01 && this.vy > -0.01) {
 		this.view.stop();
 		
@@ -177,6 +196,8 @@ GAME.Enemy.prototype.move = function(x, y)
 
 GAME.Enemy.prototype.behave = function() 
 {
+	if (this.isHit) return;
+
 	// TODO - CONFIGURE BEHAVIOR ON A MONSTER TO MONSTER BASIS
 	
 	if (this.moveFramesLeft == 0) {
@@ -202,12 +223,24 @@ GAME.Enemy.prototype.behave = function()
 	}
 }
 
+GAME.Enemy.prototype.updateHit = function()
+{
+	if (this.isHit) {
+		this.hitTime += GAME.time.DELTA_TIME;
+		
+		if (this.hitTime > this.stunDuration) {
+			this.isHit = false;
+		}
+	}
+}
+
 GAME.Enemy.prototype.update = function()
 {
 	if (this.movementDisabled) {
 		return;
 	}
 
+	this.updateHit();
 	this.behave();
 	this.animate();
 	this.move(this.vx, this.vy);

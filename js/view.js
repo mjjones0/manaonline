@@ -39,6 +39,9 @@ GAME.View.prototype.clearScene = function()
 		}
 		
 		this.hud.interactive = false;
+	} else {
+		this.hud.removeChild(OnScreenZ);
+		this.hud.removeChild(OnScreenX);
 	}
 }
 
@@ -59,6 +62,9 @@ GAME.View.prototype.createScene = function()
 		this.hud.addChild(OnScreenWheel);
 		this.hud.addChild(OnScreenRun);
 		this.hud.interactive = true;
+	} else {
+		this.hud.addChild(OnScreenZ);
+		this.hud.addChild(OnScreenX);
 	}
 }
 

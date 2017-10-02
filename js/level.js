@@ -246,6 +246,11 @@ GAME.Level.prototype.moveAndCollideMonsters = function()
 			}
 		}
 		
+		// check for attacking player
+		if (GAME.player.attacking && hitTestRectangle(GAME.player.slashBounds, this.monsters[i].bounds)) {
+			this.monsters[i].getHit();
+		}
+		
 		// if we hit an inanimate, undo and change direction
 		for (var j = 0; j < this.inanimates.length; ++j) {
 			if (hitTestRectangleRote(this.monsters[i].bounds.x, this.monsters[i].bounds.y, this.monsters[i].bounds.width, this.monsters[i].bounds.height, 
