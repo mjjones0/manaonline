@@ -1,7 +1,6 @@
 "use strict";
 
 var Container 			= PIXI.Container,
-    autoDetectRenderer 	= PIXI.autoDetectRenderer,
     loader 				= PIXI.loader,
     resources 			= PIXI.loader.resources,
     Sprite 				= PIXI.Sprite;
@@ -20,10 +19,6 @@ function load() {
 		"img/forest.png",
 		"img/cat.png",
 		"img/bush.png",
-		"img/arrow_up.png",
-		"img/arrow_down.png",
-		"img/arrow_left.png",
-		"img/arrow_right.png",
 		"img/exit.png",
 		"img/blacksquare.jpg",
 		"img/mana_tree.png",
@@ -34,7 +29,8 @@ function load() {
 		"img/keyboard_x.png",
 		"img/keyboard_z_pressed.png",
 		"img/keyboard_x_pressed.png",
-		"img/attack_icon.png"
+		"img/attack_icon.png",
+		"img/monster_death.json"
 	  ])
 	  .load(init);
 }

@@ -29,6 +29,9 @@ GAME.Enemy = function(name)
 	this.moveFramesLeft = 0;
 	this.moveDirection = 0;
 	
+	this.dying = false;
+	this.alive = true;
+	
 	this.width = data.WIDTH;
 	this.height = data.HEIGHT;
 	
@@ -113,23 +116,40 @@ GAME.Enemy.prototype.moveLeft = function()
 	this.vx = -this.speed;
 }
 
-GAME.Enemy.prototype.getHit = function()
+GAME.Enemy.prototype.getHit = function(damage)
 {
+	if (this.dying || !this.alive) return;
+
 	if (!this.isHit && this.stunDuration > 0.01) {
-		if ('hit' in this.frames) {
-			this.view.textures = this.frames['hit'];
-		}
+		this.view.textures = this.frames['hit'];
 		this.isHit = true;
 		this.hitTime = 0.0;
 		this.vx = 0;
 		this.vy = 0;
-		this.healthbar.damage(5);
+		this.healthbar.damage(damage);
+		this.health -= damage;
+		
+		if (this.health <= 0) {
+			this.health = 0;
+		}
+	} else if (!this.isHit) {
+		this.isHit = true;
+		this.hitTime = 0.0;
+		
+		this.healthbar.damage(damage);
+		this.health -= damage;
+		
+		if (this.health <= 0) {
+			this.health = 0;
+		}
 	}
 }
 
 GAME.Enemy.prototype.animate = function() 
 {
-	if (this.isHit) return;
+	if (this.isHit || this.dying) { 
+		return;
+	}
 
 	if (this.vx < 0.01 && this.vy < 0.01 && this.vx > -0.01 && this.vy > -0.01) {
 		this.view.stop();
@@ -209,7 +229,7 @@ GAME.Enemy.prototype.move = function(x, y)
 
 GAME.Enemy.prototype.behave = function() 
 {
-	if (this.isHit) return;
+	if (this.isHit || this.dying) return;
 
 	// TODO - CONFIGURE BEHAVIOR ON A MONSTER TO MONSTER BASIS
 	
@@ -244,8 +264,43 @@ GAME.Enemy.prototype.updateHit = function()
 		if (this.hitTime > this.stunDuration) {
 			this.isHit = false;
 			this.healthbar.view.alpha = 0.5;
+			
+			if (this.health <= 0) {
+				this.die();
+			}
 		}
 	}
+}
+
+GAME.Enemy.prototype.die = function()
+{
+	this.dying = true;
+	
+	var monster = this;
+	
+	// todo - play sound
+	
+	this.healthbar.view.alpha = 0;
+	GAME.wtf = this.view;
+	
+	this.view.loop = false;
+	this.view.textures = this.frames['death'];
+	this.view.animationSpeed = 0.20;
+	this.view.width = this.view.width * (this.width / GAME.MONSTER_DEATH_BASE_WIDTH); 
+	this.view.height = this.view.height * (this.height / GAME.MONSTER_DEATH_BASE_HEIGHT);
+	
+	this.view.onComplete = function() {
+		TweenLite.to(monster.view, 1.0, {
+			alpha: 0,
+			onComplete: function() {
+				monster.alive = false;
+				monster.setPosition(-1000, -1000);
+				monster.movementDisabled = true;
+			}
+		});
+	}
+	
+	this.view.gotoAndPlay(0);
 }
 
 GAME.Enemy.prototype.update = function()

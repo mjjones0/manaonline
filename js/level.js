@@ -134,6 +134,7 @@ GAME.Level.prototype.moveAndCollidePlayerX = function()
 	
 	// for each monster
 	for (var i = 0; i < this.monsters.length; ++i) {
+		if (!this.monsters[i].alive) continue;
 		// if we collide
 		if (hitTestRectangle(GAME.player.bounds, this.monsters[i].bounds)) {
 			// if monster is heavy, stop
@@ -186,6 +187,8 @@ GAME.Level.prototype.moveAndCollidePlayerY = function()
 	
 	// for each monster
 	for (var i = 0; i < this.monsters.length; ++i) {
+		if (!this.monsters[i].alive) continue;
+		
 		// if we collide
 		if (hitTestRectangle(GAME.player.bounds, this.monsters[i].bounds)) {
 			// if monster is heavy, stop
@@ -230,10 +233,17 @@ GAME.Level.prototype.moveAndCollideMonsters = function()
 	for (var i = 0; i < this.monsters.length; ++i) {
 		this.monsters[i].update();
 		
+		if (!this.monsters[i].alive) continue;
+		
 		// if we escape level, undo and change direction
 		if (contain(this.monsters[i], this.bounds)) {
 			this.monsters[i].changeDirection();
 			continue;
+		}
+		
+		// check for attacking player
+		if (GAME.player.attacking && hitTestRectangle(GAME.player.slashBounds, this.monsters[i].bounds)) {
+			this.monsters[i].getHit(GAME.player.calculateHit(this.monsters[i]));
 		}
 		
 		// if we hit the player, undo
@@ -244,11 +254,6 @@ GAME.Level.prototype.moveAndCollideMonsters = function()
 				this.monsters[i].backout();
 				continue;
 			}
-		}
-		
-		// check for attacking player
-		if (GAME.player.attacking && hitTestRectangle(GAME.player.slashBounds, this.monsters[i].bounds)) {
-			this.monsters[i].getHit();
 		}
 		
 		// if we hit an inanimate, undo and change direction

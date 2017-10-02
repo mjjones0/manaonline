@@ -17,6 +17,9 @@ GAME.MONSTER = 3;
 GAME.ITEM = 4;
 GAME.SPAWN_POINT = 5;
 
+GAME.MONSTER_DEATH_BASE_WIDTH = 30;
+GAME.MONSTER_DEATH_BASE_HEIGHT = 30;
+
 GAME.PER_LEVEL = 
 {
 	ATTACK: 1,
@@ -86,7 +89,9 @@ GAME.MONSTERS['rabite'] =
 		move_up : ['rabite_move_6', 'rabite_move_7', 'rabite_move_8'],
 		still_down : ['rabite_attack_2'],
 		still_left : ['rabite_attack_8'],
-		still_up : ['rabite_attack_5']
+		still_up : ['rabite_attack_5'],
+		death : ['monster_death_0', 'monster_death_1', 'monster_death_2', 
+			   'monster_death_3', 'monster_death_4', 'monster_death_5', 'monster_death_6'],
 	},
 	FRAME_DEFAULT: 'move_down'
 };

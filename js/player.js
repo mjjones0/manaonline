@@ -13,6 +13,7 @@ GAME.Player = function ()
 	this.cooldown = 0;
 	this.onCooldown = false;
 	this.health = GAME.PLAYER_BASE.HEALTH;
+	this.attack = GAME.PLAYER_BASE.ATTACK;
 	
 	this.inventory = {};
 	this.bounds = {};
@@ -286,7 +287,6 @@ GAME.Player.prototype.animate = function()
 			newFrames = this.frames['attack_right_0'];
 			this.view.scale.x = 1;
 		} else if (GAME.player.facingLeft()) {
-			console.log("facing left!");
 			newFrames = this.frames['attack_right_0'];
 			this.view.scale.x = -1;
 		} else if (GAME.player.facingDown()) {
@@ -453,6 +453,11 @@ GAME.Player.prototype.move = function(x, y)
 	
 	this.healthbar.view.position.x = this.position.x - this.healthbar.view.width / 2;
 	this.healthbar.view.position.y = this.position.y - this.height / 2 - this.healthbar.view.height;
+}
+
+GAME.Player.prototype.calculateHit = function(monster)
+{
+	return this.attack - monster.defense;
 }
 
 GAME.Player.prototype.adjustSlashBounds = function() 
