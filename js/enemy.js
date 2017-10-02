@@ -48,7 +48,14 @@ GAME.Enemy = function(name)
 	this.view = this.currentAnimation;
 	this.view.anchor.x = 0.5;
 	this.view.anchor.y = 0.5;
+	
 	this.bounds = {x: this.position.x, y: this.position.y, width: this.width, height: this.height};
+	
+	this.healthbar = new GAME.Healthbar();
+	this.healthbar.create(0xFFFF00, 1, 30, 8, 0xFF0000);
+	this.healthbar.setMax(data.HEALTH);
+	this.healthbar.setCurrent(this.health);
+	this.healthbar.view.alpha = 0.5;
 }
 
 GAME.Enemy.constructor = GAME.Enemy;
@@ -72,6 +79,8 @@ GAME.Enemy.prototype.setPosition = function(x, y)
 	this.view.position.y = this.position.y;
 	this.bounds.x = this.position.x - this.width / 2;
 	this.bounds.y = this.position.y - this.height / 2;
+	this.healthbar.view.position.x = this.position.x - this.healthbar.view.width / 2;
+	this.healthbar.view.position.y = this.position.y - this.height / 2 - this.healthbar.view.height;
 }
 
 GAME.Enemy.prototype.stop = function()
@@ -114,6 +123,7 @@ GAME.Enemy.prototype.getHit = function()
 		this.hitTime = 0.0;
 		this.vx = 0;
 		this.vy = 0;
+		this.healthbar.damage(5);
 	}
 }
 
@@ -192,6 +202,9 @@ GAME.Enemy.prototype.move = function(x, y)
 	
 	this.bounds.x = this.position.x - this.width / 2;
 	this.bounds.y = this.position.y - this.height / 2;
+	
+	this.healthbar.view.position.x = this.position.x - this.healthbar.view.width / 2;
+	this.healthbar.view.position.y = this.position.y - this.height / 2 - this.healthbar.view.height;
 }
 
 GAME.Enemy.prototype.behave = function() 
@@ -230,6 +243,7 @@ GAME.Enemy.prototype.updateHit = function()
 		
 		if (this.hitTime > this.stunDuration) {
 			this.isHit = false;
+			this.healthbar.view.alpha = 0.5;
 		}
 	}
 }

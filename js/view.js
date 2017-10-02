@@ -33,6 +33,10 @@ GAME.View.prototype.clearScene = function()
 	for (var i = 0; i < GAME.level.inanimates.length; ++i) {
 		this.gameScene.removeChild(GAME.level.inanimates[i]);
 	}
+	for (var i = 0; i < GAME.level.monsters.length; ++i) {
+		this.gameScene.removeChild(GAME.level.monsters[i].healthbar.view);
+	}
+	this.gameScene.removeChild(GAME.player.healthbar.view);
 	if (isMobile) {
 		this.hud.removeChild(OnScreenWheel);
 		this.hud.removeChild(OnScreenRun);
@@ -57,6 +61,10 @@ GAME.View.prototype.createScene = function()
 	for (var i = 0; i < GAME.level.inanimates.length; ++i) {
 		this.gameScene.addChild(GAME.level.inanimates[i]);
 	}
+	for (var i = 0; i < GAME.level.monsters.length; ++i) {
+		this.gameScene.addChild(GAME.level.monsters[i].healthbar.view);
+	}
+	this.gameScene.addChild(GAME.player.healthbar.view);
 	if (isMobile) {
 		this.hud.addChild(OnScreenWheel);
 		this.hud.addChild(OnScreenRun);

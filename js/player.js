@@ -12,6 +12,7 @@ GAME.Player = function ()
 	this.attacking = false;
 	this.cooldown = 0;
 	this.onCooldown = false;
+	this.health = GAME.PLAYER_BASE.HEALTH;
 	
 	this.inventory = {};
 	this.bounds = {};
@@ -157,6 +158,12 @@ GAME.Player = function ()
 		width: GAME.PLAYER_BASE.SLASH_HITBOX_SIZE, 
 		height: GAME.PLAYER_BASE.SLASH_HITBOX_SIZE
 	};
+	
+	this.healthbar = new GAME.Healthbar();
+	this.healthbar.create(0x00FF00, 1, 40, 10, 0xFF0000);
+	this.healthbar.setMax(GAME.PLAYER_BASE.HEALTH);
+	this.healthbar.setCurrent(this.health);
+	this.healthbar.view.alpha = 0.5;
 };
 
 GAME.Player.constructor = GAME.Player;
@@ -174,13 +181,20 @@ GAME.Player.prototype.setPosition = function(x, y)
 {
 	this.previous.x = this.position.x;
 	this.previous.y = this.position.y;
+	
 	this.position.x = x;
 	this.position.y = y;
+	
 	this.view.position.x = this.position.x;
 	this.view.position.y = this.position.y;
+	
 	this.bounds.x = this.position.x - this.width / 2;
 	this.bounds.y = this.position.y - this.height / 2;
+	
 	this.adjustSlashBounds();
+	
+	this.healthbar.view.position.x = this.position.x - this.healthbar.view.width / 2;
+	this.healthbar.view.position.y = this.position.y - this.height / 2 - this.healthbar.view.height;
 }
 
 GAME.Player.prototype.facingRight = function() 
@@ -436,6 +450,9 @@ GAME.Player.prototype.move = function(x, y)
 	this.bounds.y = this.position.y - this.height / 2;
 	
 	this.adjustSlashBounds();
+	
+	this.healthbar.view.position.x = this.position.x - this.healthbar.view.width / 2;
+	this.healthbar.view.position.y = this.position.y - this.height / 2 - this.healthbar.view.height;
 }
 
 GAME.Player.prototype.adjustSlashBounds = function() 
