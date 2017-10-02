@@ -141,7 +141,12 @@ function setup_buttons() {
 	OnScreenWheel.interactive = true;
 	OnScreenWheel.buttonMode = true;
 	OnScreenWheel.center = {x: OnScreenWheel.width / 2 + 4, y: GAME.BASEHEIGHT - OnScreenWheel.height / 2 - 4};
-	OnScreenWheel.outerBounds = {x: 0, y: GAME.BASEHEIGHT - OnScreenWheel.height - 8, width: OnScreenWheel.width + 8, height: OnScreenWheel.height + 8};
+	OnScreenWheel.outerBounds = {
+		x: 0, 
+		y: GAME.BASEHEIGHT - OnScreenWheel.height - 8, 
+		width: OnScreenWheel.width + 8, 
+		height: OnScreenWheel.height + 8
+	};
 	OnScreenWheel.on('pointerdown', function (eventData) {
 		var pX = eventData.data.global.x;
 		var pY = eventData.data.global.y;
@@ -164,16 +169,37 @@ function setup_buttons() {
 	OnScreenRun.y = GAME.BASEHEIGHT - OnScreenRun.height - OnScreenRun.height / 4;
 	OnScreenRun.interactive = true;
 	OnScreenRun.buttonMode = true;
+	OnScreenRun.outerBounds = {
+		x: GAME.BASEWIDTH - OnScreenRun.width - OnScreenRun.width / 4 - 4,
+		y: GAME.BASEHEIGHT - OnScreenRun.height - OnScreenRun.height / 4 - 4,
+		width: OnScreenRun.width + 8,
+		height: OnScreenRun.height + 8
+	};
 	OnScreenRun.on('pointerdown', function () {
 		zPressed = true;
 	});
 	OnScreenRun.on('pointerup', function () {
 		zPressed = false;
 	});
+	OnScreenRun.on('pointermove', function (eventData) {
+		var pX = eventData.data.global.x;
+		var pY = eventData.data.global.y;
+		if (rectContains(OnScreenRun, pX, pY)) {
+			zPressed = true;
+		} else if (rectContains(OnScreenRun.outerBounds, pX, pY)) {
+			zPressed = false;
+		}
+	});
 	
 	OnScreenAttack = new PIXI.Sprite(resources["img/attack_icon.png"].texture);
 	OnScreenAttack.x = OnScreenRun.x - OnScreenAttack.width - OnScreenAttack.width / 4;
 	OnScreenAttack.y = GAME.BASEHEIGHT - OnScreenAttack.height - OnScreenAttack.height / 4;
+	OnScreenAttack.outerBounds = {
+		x: GAME.BASEWIDTH - OnScreenAttack.width - OnScreenAttack.width / 4 - 4,
+		y: GAME.BASEHEIGHT - OnScreenAttack.height - OnScreenAttack.height / 4 - 4,
+		width: OnScreenAttack.width + 8,
+		height: OnScreenAttack.height + 8
+	};
 	OnScreenAttack.interactive = true;
 	OnScreenAttack.buttonMode = true;
 	OnScreenAttack.on('pointerdown', function () {
@@ -181,6 +207,15 @@ function setup_buttons() {
 	});
 	OnScreenAttack.on('pointerup', function () {
 		xPressed = false;
+	});
+	OnScreenAttack.on('pointermove', function (eventData) {
+		var pX = eventData.data.global.x;
+		var pY = eventData.data.global.y;
+		if (rectContains(OnScreenAttack, pX, pY)) {
+			xPressed = true;
+		} else if (rectContains(OnScreenAttack.outerBounds, pX, pY)) {
+			xPressed = false;
+		}
 	});
 }
 
