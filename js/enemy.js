@@ -30,7 +30,6 @@ GAME.Enemy = function(name)
 	
 	this.frames = [];
 	
-	// get animation frames from data
 	for (var key in data.FRAMES) {
 		if (data.FRAMES.hasOwnProperty(key)) {
 			this.frames[key] = [];
@@ -39,38 +38,6 @@ GAME.Enemy = function(name)
 			}
 		}
 	}
-	
-	/*
-	this.moveDownFrames = [];
-	this.moveLeftFrames = [];
-	this.moveUpFrames = [];
-	this.moveRightFrames = [];
-	this.getHitFrames = [];
-	this.attackLeftFrames = [];
-	this.attackRightFrames = [];
-	this.combatLeftFrames = [];
-	this.combatRightFrames = [];
-	
-	for (var i = 0; i < data.MOVE_FRAMES; ++i) {
-		if (PIXI.Texture.fromFrame(this.name + "_move_down_" + i + ".png")) { 
-			this.moveDownFrames.push(PIXI.Texture.fromFrame(this.name + "_move_down_" + i + ".png")); 
-		}
-		if (PIXI.Texture.fromFrame(this.name + "_move_left_" + i + ".png")) {
-			this.moveLeftFrames.push(PIXI.Texture.fromFrame(this.name + "_move_left_" + i + ".png"));
-		}
-		if (PIXI.Texture.fromFrame(this.name + "_move_right_" + i + ".png")) {
-			this.moveRightFrames.push(PIXI.Texture.fromFrame(this.name + "_move_right_" + i + ".png"));
-		}
-		if (PIXI.Texture.fromFrame(this.name + "_move_up_" + i + ".png")) {
-			this.moveUpFrames.push(PIXI.Texture.fromFrame(this.name + "_move_up_" + i + ".png"));
-		}
-	}
-	
-	for (var i = 0; i < data.HIT_FRAMES; ++i) {
-		if (PIXI.Texture.fromFrame(this.name + "_get_hit_" + i + ".png")) {
-			this.getHitFrames.push(PIXI.Texture.fromFrame(this.name + "_get_hit_" + i + ".png"));
-		}
-	}*/
 	
 	this.currentAnimation = new PIXI.extras.AnimatedSprite(this.frames[data.FRAME_DEFAULT]);
 	this.currentAnimation.animationSpeed = 0.08;
@@ -99,6 +66,8 @@ GAME.Enemy.prototype.setPosition = function(x, y)
 	this.position.y = y;
 	this.view.position.x = this.position.x;
 	this.view.position.y = this.position.y;
+	this.bounds.x = this.position.x - this.width / 2;
+	this.bounds.y = this.position.y - this.height / 2;
 }
 
 GAME.Enemy.prototype.stop = function()
@@ -147,13 +116,13 @@ GAME.Enemy.prototype.animate = function()
 		var newFrames;
 		var angle = Math.atan2(this.vy, this.vx) * GAME.RADIANSTOANGLE;
 		
+		// assumes enemies have sprites for up, left, and down only - may need to revise later
 		if (angle > -45 && angle < 45) {
 			newFrames = this.frames['move_left'];
 			this.view.scale.x = -1;
 		} else if (angle < -45 && angle > -135) {
 			newFrames = this.frames['move_up'];
 			this.view.scale.x = 1;
-		// left
 		} else if (angle < -135 || angle > 135) {
 			newFrames = this.frames['move_left'];
 			this.view.scale.x = 1;
@@ -162,7 +131,7 @@ GAME.Enemy.prototype.animate = function()
 			this.view.scale.x = 1;
 		} else {
 			console.log(angle);
-			alert("ASPLODE");
+			alert("BAD ANGLE ON MOVEMENT FOR ANIMATION PLEASE EXPLORE");
 		}
 		
 		if (this.view.textures != newFrames) {
@@ -186,6 +155,9 @@ GAME.Enemy.prototype.backout = function()
 	
 	this.view.position.x = this.position.x;
 	this.view.position.y = this.position.y;
+	
+	this.bounds.x = this.position.x - this.width / 2;
+	this.bounds.y = this.position.y - this.height / 2;
 }
 
 GAME.Enemy.prototype.move = function(x, y)
@@ -205,6 +177,8 @@ GAME.Enemy.prototype.move = function(x, y)
 
 GAME.Enemy.prototype.behave = function() 
 {
+	// TODO - CONFIGURE BEHAVIOR ON A MONSTER TO MONSTER BASIS
+	
 	if (this.moveFramesLeft == 0) {
 		this.moveFramesLeft = randomInt(100, 200);
 		this.moveDirection = randomInt(1, 7);

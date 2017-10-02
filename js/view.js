@@ -56,15 +56,9 @@ GAME.View.prototype.createScene = function()
 		this.gameScene.addChild(GAME.level.inanimates[i]);
 	}
 	if (isMobile) {
-	/*
-		for (var i = 0; i < OnScreenDPad.length; ++i) {
-			this.hud.addChild(OnScreenDPad[i]);
-		}
-		*/
 		this.hud.addChild(OnScreenWheel);
 		this.hud.addChild(OnScreenRun);
-		
-		GAME.input.bindToContainer(this.hud);
+		this.hud.interactive = true;
 	}
 }
 

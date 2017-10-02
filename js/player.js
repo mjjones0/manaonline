@@ -67,23 +67,6 @@ GAME.Player = function ()
 	this.frames['still_right'] = [ PIXI.Texture.fromFrame('still_1.png') ];
 	this.frames['still_up'] = [ PIXI.Texture.fromFrame('still_2.png') ];
 	
-	this.walkDownFrames = [];
-	this.walkLeftFrames = [];
-	this.walkUpFrames = [];
-	this.walkRightFrames = [];
-	
-	this.FaceLeftFrame = PIXI.Texture.fromFrame("still_left.png");
-	this.FaceDownFrame = PIXI.Texture.fromFrame("still_down.png");
-	this.FaceRightFrame = PIXI.Texture.fromFrame("still_right.png");
-	this.FaceUpFrame = PIXI.Texture.fromFrame("still_up.png");
-	
-	for (var i = 0; i < 6; ++i) {
-		this.walkDownFrames.push(PIXI.Texture.fromFrame("walk_down_" + i + ".png"));
-		this.walkLeftFrames.push(PIXI.Texture.fromFrame("walk_left_" + i + ".png"));
-		this.walkRightFrames.push(PIXI.Texture.fromFrame("walk_right_" + i + ".png"));
-		this.walkUpFrames.push(PIXI.Texture.fromFrame("walk_up_" + i + ".png"));
-	}
-	
 	this.currentAnimation = new PIXI.extras.AnimatedSprite(this.frames['walk_down']);
 	this.currentAnimation.animationSpeed = 0.15;
 	this.view = this.currentAnimation;
@@ -150,21 +133,6 @@ GAME.Player.prototype.animate = function()
 			newFrames = this.running ? this.frames['run_down'] : this.frames['walk_down'];
 			this.view.scale.x = 1;
 		}
-	
-		/*
-		// right
-		if (this.vx > 0.01 && this.vy < 0.01) {
-			newFrames = this.walkRightFrames;
-		// down
-		} else if (this.vx < 0.01 && this.vy > 0.01) {
-			newFrames = this.walkDownFrames;
-		// left
-		} else if (this.vx < -0.01 && this.vy < 0.01) {
-			newFrames = this.walkLeftFrames;
-		// up
-		} else if (this.vx < 0.01 && this.vy < -0.01) {
-			newFrames = this.walkUpFrames;
-		}*/
 		
 		if (this.view.textures != newFrames) {
 			this.view.textures = newFrames;
@@ -269,7 +237,6 @@ GAME.Player.prototype.update = function()
 	
 	this.handleInput();
 	this.animate();
-	//this.move(this.vx, this.vy);
 }
 
 GAME.Player.prototype.backout = function()
