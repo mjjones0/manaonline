@@ -28,7 +28,8 @@ function load() {
 		"img/blacksquare.jpg",
 		"img/mana_tree.png",
 		"img/duran.json",
-		"img/rabite.json"
+		"img/rabite.json",
+		"img/run_icon.png"
 	  ])
 	  .load(init);
 }

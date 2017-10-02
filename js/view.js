@@ -62,6 +62,7 @@ GAME.View.prototype.createScene = function()
 		}
 		*/
 		this.hud.addChild(OnScreenWheel);
+		this.hud.addChild(OnScreenRun);
 		
 		GAME.input.bindToContainer(this.hud);
 	}

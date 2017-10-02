@@ -15,6 +15,7 @@ var leftPressed  = false,
 GAME.dirs = [];
 var OnScreenDPad = new Array(4);
 var OnScreenWheel;
+var OnScreenRun;
 
 GAME.Input = function()
 {
@@ -124,28 +125,13 @@ function circlePadMove(pX, pY)
 		} else {
 			alert("YOU JUST GOT MEMED!");
 		}
-	} else {
-		up.release();
-		down.release();
-		left.release();
-		right.release();
 	}
 }
 
 GAME.Input.prototype.bindToContainer = function(container)
 {
-	container.interactive = true;
-	container.on('pointermove', onPointerMove);
-	container.on('pointerdown', onPointerDown);
-	
-	if (isMobile) {
-		container.on('pointerup', function () {
-			up.release();
-			left.release();
-			down.release();
-			right.release();
-		});
-	}
+	OnScreenWheel.interactive = true;
+	OnScreenRun.interactive = true;
 }
 
 GAME.Input.prototype.release = function()
@@ -382,6 +368,34 @@ function setup_buttons() {
 	OnScreenWheel.interactive = true;
 	OnScreenWheel.buttonMode = true;
 	OnScreenWheel.center = {x: OnScreenWheel.width / 2, y: GAME.BASEHEIGHT - OnScreenWheel.height / 2};
+	OnScreenWheel.on('pointerdown', function (eventData) {
+		var pX = eventData.data.global.x;
+		var pY = eventData.data.global.y;
+		circlePadMove(pX, pY);
+	});
+	OnScreenWheel.on('pointermove', function (eventData) {
+		var pX = eventData.data.global.x;
+		var pY = eventData.data.global.y;
+		circlePadMove(pX, pY);
+	});
+	OnScreenWheel.on('pointerup', function () {
+		up.release();
+		left.release();
+		down.release();
+		right.release();
+	});
+	
+	OnScreenRun = new PIXI.Sprite(resources["img/run_icon.png"].texture);
+	OnScreenRun.x = GAME.BASEWIDTH - OnScreenRun.width - OnScreenRun.width / 4;
+	OnScreenRun.y = GAME.BASEHEIGHT - OnScreenRun.height - OnScreenRun.height / 4;
+	OnScreenRun.interactive = true;
+	OnScreenRun.buttonMode = true;
+	OnScreenRun.on('pointerdown', function () {
+		zPressed = true;
+	});
+	OnScreenRun.on('pointerup', function () {
+		zPressed = false;
+	});
 }
 
 
