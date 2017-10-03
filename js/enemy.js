@@ -116,9 +116,39 @@ GAME.Enemy.prototype.moveLeft = function()
 	this.vx = -this.speed;
 }
 
+GAME.Enemy.prototype.spawnDamageText = function (text, duration, color) 
+{
+	var style = new PIXI.TextStyle({
+		fontFamily: 'Arial',
+		fontSize: 14,
+		fontStyle: 'normal',
+		fontWeight: 'normal',
+		fill: ['#ffffff', color],
+		stroke: '#4a1850',
+		strokeThickness: 2
+	});
+
+	var textSprite = new PIXI.Text(text, style);
+	textSprite.position.x = this.position.x;
+	textSprite.position.y = this.position.y - this.bounds.height;
+	textSprite.updateText();
+	
+	this.damageTime = 0;
+	this.damageTextDuration = duration;
+	this.damageText = new PIXI.Sprite(textSprite.texture);
+	
+	GAME.level.engine.view.gameScene.addChild(this.damageText);
+}
+
 GAME.Enemy.prototype.getHit = function(damage)
 {
 	if (this.dying || !this.alive) return;
+	
+	if (!this.isHit) {
+		GAME.audio.playSound('slashed_1', 0.5);
+		this.spawnDamageText(damage.toString(), 0.75, 0xFFFF00);
+		console.log("DAMAGE TEXT SPAWNED");
+	}
 
 	if (!this.isHit && this.stunDuration > 0.01) {
 		this.view.textures = this.frames['hit'];
@@ -272,16 +302,37 @@ GAME.Enemy.prototype.updateHit = function()
 	}
 }
 
+GAME.Enemy.prototype.updateDamageText = function()
+{
+	if (this.isHit && this.damageText && this.damageTime < this.damageTextDuration) {
+		this.damageTime += GAME.time.DELTA_TIME;
+		
+		var ratio = this.damageTime / this.damageTextDuration;
+		
+		var x = (3 * 3.141592 / 4.0) * ratio; 
+		var y = 30 * Math.sin(x * 2);
+		
+		this.damageText.alpha = 1.0 - ratio;
+		this.damageText.position.x = this.position.x + (ratio * 50);
+		this.damageText.position.y = this.position.y - this.bounds.height / 2 - this.damageText.height - y;
+		
+		if (this.damageTime >= this.damageTextDuration) {
+			this.damageText.alpha = 0;
+			this.damageTextDuration = 0;
+			GAME.level.engine.view.gameScene.removeChild(this.damageText);
+		}
+	}
+}
+
 GAME.Enemy.prototype.die = function()
 {
 	this.dying = true;
 	
 	var monster = this;
 	
-	// todo - play sound
+	GAME.audio.playSound('monster_death_1', 0.5);
 	
 	this.healthbar.view.alpha = 0;
-	GAME.wtf = this.view;
 	
 	this.view.loop = false;
 	this.view.textures = this.frames['death'];
@@ -310,6 +361,7 @@ GAME.Enemy.prototype.update = function()
 	}
 
 	this.updateHit();
+	this.updateDamageText();
 	this.behave();
 	this.animate();
 	this.move(this.vx, this.vy);

@@ -324,6 +324,7 @@ GAME.Player.prototype.handleInput = function()
 	
 	if (xPressed && !this.attacking && !this.onCooldown) {
 		this.attacking = true;
+		GAME.audio.playSound('slash_1', 0.5);
 	}
 	
 	var speed = GAME.PLAYER_BASE.WALK_SPEED;
@@ -458,6 +459,11 @@ GAME.Player.prototype.move = function(x, y)
 GAME.Player.prototype.calculateHit = function(monster)
 {
 	return this.attack - monster.defense;
+}
+
+GAME.Player.prototype.middleOfSlash = function()
+{
+	return this.attacking && this.view.currentFrame == 3;
 }
 
 GAME.Player.prototype.adjustSlashBounds = function() 

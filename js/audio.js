@@ -6,6 +6,9 @@ GAME.Audio = function()
 	this.sounds = {};
 	
 	this.music['path'] = new Audio("audio/path.mp3");
+	this.sounds['slash_1'] = new Audio("audio/slash_1.wav");
+	this.sounds['slashed_1'] = new Audio("audio/slash_2.wav");
+	this.sounds['monster_death_1'] = new Audio("audio/death_0.wav");
 }
 
 GAME.Audio.constructor = GAME.Audio;

@@ -156,7 +156,8 @@ GAME.LEVELS['demo_room_0'] =
 	BACKGROUND: "img/forest.png",
 	BG_WIDTH: 800,
 	BG_HEIGHT: 600,
-	SONG: "path"
+	SONG: "path",
+	TITLE: "Demo Room 0"
 }
 
 GAME.LEVELS['demo_room_1'] = 
@@ -262,5 +263,6 @@ GAME.LEVELS['demo_room_1'] =
 	BACKGROUND: "img/forest.png",
 	BG_WIDTH: 800,
 	BG_HEIGHT: 600,
-	SONG: "path"
+	SONG: "path",
+	TITLE: "Demo Room 1"
 }

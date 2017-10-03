@@ -73,6 +73,8 @@ GAME.Level.prototype.load = function(name, spawnX, spawnY)
 	GAME.audio.playMusic(this.song, true, 0.3);
 	
 	this.engine.view.createScene();
+	
+	this.showTitle(GAME.LEVELS[name].TITLE, 3, 0.5);
 }
 
 GAME.Level.prototype.changeLevel = function(name, x, y, duration)
@@ -118,6 +120,74 @@ GAME.Level.prototype.changeLevel = function(name, x, y, duration)
 			}, duration);
 		}
 	});
+}
+
+GAME.Level.prototype.showTitle = function(title, showDuration, fadeDuration)
+{
+	var titleContainer = new Container;
+
+	var style = new PIXI.TextStyle({
+		fontFamily: 'Arial',
+		fontSize: 24,
+		fontStyle: 'normal',
+		fontWeight: 'normal',
+		fill: ['#ffffff', '#ffff00'], // gradient
+		stroke: '#4a1850',
+		strokeThickness: 3,
+		dropShadow: true,
+		dropShadowColor: '#000000',
+		dropShadowBlur: 4,
+		dropShadowAngle: Math.PI / 6,
+		dropShadowDistance: 6,
+		wordWrap: true,
+		wordWrapWidth: 440
+	});
+
+	var titleSprite = new PIXI.Text(title, style);
+	
+	var fillColor = 0x111111;
+	var borderColor = 0x665D1E;
+	var borderWidth = 500;
+	var borderHeight = 40;
+	var borderThickness = 2;
+	
+	var border = new PIXI.Graphics();
+	border.beginFill(0x000000, 0);
+	border.lineStyle(borderThickness, borderColor, 0.5);
+	border.drawRect(0, 0, borderWidth, borderHeight);
+	
+	var fill = new PIXI.Graphics();
+	fill.beginFill(fillColor, 0.5);
+	fill.lineStyle(1, 0xFFFFFF, 0.0);
+	fill.drawRect(borderThickness, borderThickness, 
+				  borderWidth 	- (borderThickness * 2), 
+				  borderHeight 	- (borderThickness * 2));
+				  
+	titleSprite.position.x = borderWidth / 2 - titleSprite.width / 2;
+	titleSprite.position.y = borderHeight / 2 - titleSprite.height / 2 + 3;
+				  
+	titleContainer.addChild(fill);
+	titleContainer.addChild(border);
+	titleContainer.addChild(titleSprite);
+	
+	titleContainer.position.x = GAME.BASEWIDTH / 2 - titleContainer.width / 2;
+	titleContainer.position.y = 4;
+	
+	var hud = this.engine.view.hud;
+	hud.addChild(titleContainer);
+	
+	// transition out
+	setTimeout(function () {
+		TweenLite.to(titleContainer, fadeDuration, {
+			alpha : 0,
+			onComplete: function() {
+				hud.removeChild(titleContainer);
+			}
+		});
+		TweenLite.to(titleContainer.position, fadeDuration, {
+			x : GAME.BASEWIDTH
+		});
+	}, showDuration * 1000);
 }
 
 GAME.Level.prototype.moveAndCollidePlayerX = function() 
@@ -242,7 +312,8 @@ GAME.Level.prototype.moveAndCollideMonsters = function()
 		}
 		
 		// check for attacking player
-		if (GAME.player.attacking && hitTestRectangle(GAME.player.slashBounds, this.monsters[i].bounds)) {
+		if (GAME.player.attacking && hitTestRectangle(GAME.player.slashBounds, this.monsters[i].bounds) &&
+			GAME.player.middleOfSlash()) {
 			this.monsters[i].getHit(GAME.player.calculateHit(this.monsters[i]));
 		}
 		

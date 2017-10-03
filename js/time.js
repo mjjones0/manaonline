@@ -16,10 +16,6 @@ Time.prototype.update = function()
     var passedTime = currentTime - this.lastTime;
 
 	this.DELTA_TIME = (passedTime * this.speed) / 1000;
-	
-    //this.DELTA_TIME = ((passedTime) * 0.06);
-    //this.DELTA_TIME *= this.speed;
-    //if(this.DELTA_TIME > 2.3) this.DELTA_TIME = 2.3;
 
     this.lastTime = currentTime;
 }

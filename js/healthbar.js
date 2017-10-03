@@ -31,9 +31,10 @@ GAME.Healthbar.prototype.create = function(borderColor, borderThickness, borderW
 	
 	// fill
 	this.fill.beginFill(fillColor, 0.75);
-	this.fill.lineStyle(1, 0xFFFFFF, 0.75);
+	this.fill.lineStyle(1, 0xFFFFFF, 0.0);
 	this.fill.drawRect(borderThickness, borderThickness, 
-					   borderWidth - (borderThickness * 2), borderHeight - (borderThickness * 2));
+					   borderWidth - (borderThickness * 2), 
+					   borderHeight - (borderThickness * 2));
 	
 	this.width = borderWidth;
 	this.height = borderHeight;
@@ -53,16 +54,16 @@ GAME.Healthbar.prototype.damage = function(damage)
 	
 	// tween a flash fade in (white to dest color)
 	TweenLite.to(this.view, 1, {
-		alpha : 0.5 });
+		alpha : 0.5 
+	});
 	
 	// tween a scale decrease of the fill
-	TweenLite.to(this.fill.scale, 0.3, {
-		x : (this.current - damage) / this.max });
-	
-	// MAYBE - tween a fade out after the scale decrease
+	TweenLite.to(this.fill.scale, 0.75, {
+		x : (this.current - damage) / this.max,
+		ease : Cubic.easeOut
+	});
 	
 	this.current = this.current - damage;
-	//this.setCurrent(this.current - damage);
 }
 
 GAME.Healthbar.prototype.heal = function(heal)

@@ -48,6 +48,36 @@ GAME.View.prototype.clearScene = function()
 	}
 }
 
+GAME.View.prototype.arcingText = function(text, startPosition, endPosition, durationInFrames, color) 
+{
+	var style = new PIXI.TextStyle({
+		fontFamily: 'Arial',
+		fontSize: 12,
+		fontStyle: 'normal',
+		fontWeight: 'normal',
+		fill: ['#ffffff', color],
+		stroke: '#4a1850',
+		strokeThickness: 2
+	});
+
+	var textSprite = new PIXI.Text(text, style);
+	textSprite.position.x = startPosition.x;
+	textSprite.position.y = startPosition.y;
+	
+	this.gameScene.addChild(textSprite);
+	var gameScene = this.gameScene;
+	
+	TweenLite.to(textSprite.position, durationInFrames, {
+		x : endPosition.x,
+		y : endPosition.y,
+		ease : Cubic.EaseOut,
+		useFrames : true,
+		onComplete : function () {
+			gameScene.removeChild(textSprite);
+		}
+	});
+} 
+
 GAME.View.prototype.createScene = function()
 {
 	this.gameScene.addChild(GAME.level.bg);
