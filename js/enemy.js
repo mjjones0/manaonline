@@ -137,6 +137,17 @@ GAME.Enemy.prototype.spawnDamageText = function (text, duration, color)
 	this.damageTextDuration = duration;
 	this.damageText = new PIXI.Sprite(textSprite.texture);
 	
+	// tween x value
+	this.damageText.moveX = 0;
+	TweenLite.to(this.damageText, duration, {
+		moveX : 1.4,
+		Ease: Power2.EaseIn
+	});
+	TweenLite.to(this.damageText, duration * 0.5, {
+		alpha : 0,
+		delay : duration * 0.5
+	});
+	
 	GAME.level.engine.view.gameScene.addChild(this.damageText);
 }
 
@@ -309,15 +320,12 @@ GAME.Enemy.prototype.updateDamageText = function()
 		
 		var ratio = this.damageTime / this.damageTextDuration;
 		
-		var x = (3 * 3.141592 / 4.0) * ratio; 
-		var y = 30 * Math.sin(x * 2);
+		var y = 30 * Math.sin(this.damageText.moveX * 2);
 		
-		this.damageText.alpha = 1.0 - ratio;
-		this.damageText.position.x = this.position.x + (ratio * 50);
+		this.damageText.position.x = this.position.x + (ratio * 20);
 		this.damageText.position.y = this.position.y - this.bounds.height / 2 - this.damageText.height - y;
 		
 		if (this.damageTime >= this.damageTextDuration) {
-			this.damageText.alpha = 0;
 			this.damageTextDuration = 0;
 			GAME.level.engine.view.gameScene.removeChild(this.damageText);
 		}
