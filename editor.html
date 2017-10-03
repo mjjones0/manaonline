@@ -1,0 +1,40 @@
+<html>
+	<head>
+		<title>Level Editor</title>
+		<link rel="stylesheet" type="text/css" href="css/editorstyle.css">
+		<script type="text/javascript" src="pixi.js"></script>
+		<script src="js/data.js"></script>
+		<script src="js/editor.js"></script>
+	</head>
+	<body>
+		<table style="width:100%">
+			<tr>
+				<td style="width:15%">
+					<div id="leftContent">
+						<button id="loadBG">Load BG</button>
+						<button id="loadFG">Load FG</button><br/>
+						<br/><br/><br/><br/>
+						Tile Width: <input type="text" id="tileWidth"></input><br/>
+						Tile Height: <input type="text" id="tileHeight"></input><br/>
+					</div>
+				</td>
+				<td style="width:70%">
+					<div id="centerContent">
+						Title: <input type="text" id="title"></input><br/>
+					</div>
+				</td>
+				<td style="width:15%">
+					<div id="rightContent">
+						Song: <input type="text" id="song"></input><br/>
+						<button id="collisions">Set Collisions</button><br/>
+						<button id="addEntity">Add Entity</button><br/>
+						<button id="removeEntity">Remove Entity</button><br/>
+						<br/><br/><br/><br/><br/>
+						<button id="save">Save Level</button>
+						<button id="cancel">Cancel</button><br/>
+					</div>
+				</td>
+			</tr>
+		</table>
+	</body>
+</html>
