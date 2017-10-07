@@ -1,11 +1,16 @@
-#title {
-	text-align: center;
+#centerContent {
+	margin-left: auto;
+	margin-right: auto;
 }
 
 #leftContent {
-	text-align: left;
+	width: 150px;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 #rightContent {
-	text-align: right;
+	width: 200px;
+	margin-left: auto;
+	margin-right: auto;
 }

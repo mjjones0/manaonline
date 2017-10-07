@@ -24,8 +24,8 @@ GAME.Level.prototype.load = function(name, spawnX, spawnY)
 	this.song = data.SONG;
 	
 	// create entity containers
-	this.inanimates = [];
-	this.inanimates_data = [];
+	this.objects = [];
+	this.objects_data = [];
 	this.monsters = [];
 	this.monsters_data = [];
 	this.exits = [];
@@ -35,12 +35,12 @@ GAME.Level.prototype.load = function(name, spawnX, spawnY)
 	for (var i = 0; i < data.ENTITIES.length; ++i) {
 		var entity = data.ENTITIES[i];
 		
-		if (entity.TYPE == GAME.INANIMATE) {
-			var inanimate = new Sprite(resources[entity.TEXTURE].texture);
-			inanimate.x = entity.X;
-			inanimate.y = entity.Y;
-			this.inanimates.push(inanimate);
-			this.inanimates_data.push(entity);
+		if (entity.TYPE == GAME.OBJECT) {
+			var object = new Sprite(resources[entity.TEXTURE].texture);
+			object.x = entity.X;
+			object.y = entity.Y;
+			this.objects.push(object);
+			this.objects_data.push(entity);
 		} else if (entity.TYPE == GAME.MONSTER) {
 			var monster = new GAME.Enemy(entity.ID);
 			monster.setPosition(entity.X, entity.Y);
@@ -194,9 +194,9 @@ GAME.Level.prototype.moveAndCollidePlayerX = function()
 {
 	// move player X -> if we collide into a block, undo
 	GAME.player.moveX();
-	for (var i = 0; i < this.inanimates.length; ++i) {
+	for (var i = 0; i < this.objects.length; ++i) {
 		if (hitTestRectangleRote(GAME.player.bounds.x, GAME.player.bounds.y, GAME.player.bounds.width, GAME.player.bounds.height, 
-							 this.inanimates[i].x, this.inanimates[i].y, this.inanimates[i].width, this.inanimates[i].height)) {
+							 this.objects[i].x, this.objects[i].y, this.objects[i].width, this.objects[i].height)) {
 			GAME.player.backout();
 			return;
 		}
@@ -220,9 +220,9 @@ GAME.Level.prototype.moveAndCollidePlayerX = function()
 				this.monsters[i].move(playerUnitDir * depth, 0);
 				
 				// if we push them into a block, however, undo everything
-				for (var j = 0; j < this.inanimates.length; ++j) {
+				for (var j = 0; j < this.objects.length; ++j) {
 					if (hitTestRectangleRote(this.monsters[i].bounds.x, this.monsters[i].bounds.y, this.monsters[i].bounds.width, this.monsters[i].bounds.height, 
-										 this.inanimates[j].x, this.inanimates[j].y, this.inanimates[j].width, this.inanimates[j].height)) {
+										 this.objects[j].x, this.objects[j].y, this.objects[j].width, this.objects[j].height)) {
 						GAME.player.backout();
 						this.monsters[i].backout();
 						return;
@@ -247,9 +247,9 @@ GAME.Level.prototype.moveAndCollidePlayerY = function()
 	// move y direction
 	GAME.player.moveY();
 	// if we collide with a block, undo and return
-	for (var i = 0; i < this.inanimates.length; ++i) {
+	for (var i = 0; i < this.objects.length; ++i) {
 		if (hitTestRectangleRote(GAME.player.bounds.x, GAME.player.bounds.y, GAME.player.bounds.width, GAME.player.bounds.height, 
-							 this.inanimates[i].x, this.inanimates[i].y, this.inanimates[i].width, this.inanimates[i].height)) {
+							 this.objects[i].x, this.objects[i].y, this.objects[i].width, this.objects[i].height)) {
 			GAME.player.backout();
 			return;
 		}
@@ -276,9 +276,9 @@ GAME.Level.prototype.moveAndCollidePlayerY = function()
 				this.monsters[i].move(0, playerUnitDir * depth);
 				
 				// if we push them into a block, however, undo everything
-				for (var j = 0; j < this.inanimates.length; ++j) {
+				for (var j = 0; j < this.objects.length; ++j) {
 					if (hitTestRectangleRote(this.monsters[i].bounds.x, this.monsters[i].bounds.y, this.monsters[i].bounds.width, this.monsters[i].bounds.height, 
-										 this.inanimates[j].x, this.inanimates[j].y, this.inanimates[j].width, this.inanimates[j].height)) {
+										 this.objects[j].x, this.objects[j].y, this.objects[j].width, this.objects[j].height)) {
 						GAME.player.backout();
 						this.monsters[i].backout();
 						return;
@@ -327,10 +327,10 @@ GAME.Level.prototype.moveAndCollideMonsters = function()
 			}
 		}
 		
-		// if we hit an inanimate, undo and change direction
-		for (var j = 0; j < this.inanimates.length; ++j) {
+		// if we hit an object, undo and change direction
+		for (var j = 0; j < this.objects.length; ++j) {
 			if (hitTestRectangleRote(this.monsters[i].bounds.x, this.monsters[i].bounds.y, this.monsters[i].bounds.width, this.monsters[i].bounds.height, 
-								 this.inanimates[j].x, this.inanimates[j].y, this.inanimates[j].width, this.inanimates[j].height)) {
+								 this.objects[j].x, this.objects[j].y, this.objects[j].width, this.objects[j].height)) {
 				this.monsters[i].backout();
 				this.monsters[i].changeDirection();
 				break;

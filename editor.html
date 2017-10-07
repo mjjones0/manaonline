@@ -1,37 +1,50 @@
 <html>
 	<head>
+		<meta charset="UTF-8">
 		<title>Level Editor</title>
 		<link rel="stylesheet" type="text/css" href="css/editorstyle.css">
 		<script type="text/javascript" src="pixi.js"></script>
+		<script type="text/javascript" src="pixi-display.js"></script>
+		<script src="js/constants.js"></script>
 		<script src="js/data.js"></script>
 		<script src="js/editor.js"></script>
 	</head>
 	<body>
-		<table style="width:100%">
+		<table style="width:100%; height:100%; background-color: black; color: white;">
 			<tr>
-				<td style="width:15%">
+				<th></th>
+				<th>
+					Title: <input type="text" id="title"></input><br/>
+				</th>
+				<th></th>
+			</tr>
+			<tr>
+				<td style="width:22%;">
 					<div id="leftContent">
-						<button id="loadBG">Load BG</button>
-						<button id="loadFG">Load FG</button><br/>
+						<br/><br/>
+						<button id="clear">Clear Scene</button><br/>
+						<br/><br/>
+						Background: <input type="file" id="loadBG"/><br/>
+						Foreground: <input type="file" id="loadFG"/><br/>
 						<br/><br/><br/><br/>
 						Tile Width: <input type="text" id="tileWidth"></input><br/>
 						Tile Height: <input type="text" id="tileHeight"></input><br/>
 					</div>
 				</td>
-				<td style="width:70%">
-					<div id="centerContent">
-						Title: <input type="text" id="title"></input><br/>
-					</div>
+				<td style="width:56%" id="centerContent">
 				</td>
-				<td style="width:15%">
+				<td style="width:22%;">
 					<div id="rightContent">
-						Song: <input type="text" id="song"></input><br/>
-						<button id="collisions">Set Collisions</button><br/>
-						<button id="addEntity">Add Entity</button><br/>
-						<button id="removeEntity">Remove Entity</button><br/>
-						<br/><br/><br/><br/><br/>
+						<div id="entitySettings" style="display: none;">
+						</div>
+						<br/><br/>
+						Load Existing Level: <input type="file" id="loadLevel"/><br/>
+						<br/><br/><br/><br/>
+						Song: <select id="songs"></select><br/><br/>
+						<button id="collisions">Set Collisions</button><br/><br/><br/>
+						<select id="entities"></select><button id="addEntity">Add Entity</button><br/>
+						<br/><br/>
 						<button id="save">Save Level</button>
-						<button id="cancel">Cancel</button><br/>
 					</div>
 				</td>
 			</tr>

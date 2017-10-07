@@ -30,8 +30,8 @@ GAME.View.prototype.clearScene = function()
 	for (var i = 0; i < GAME.level.monsters.length; ++i) {
 		this.gameScene.removeChild(GAME.level.monsters[i].view);
 	}
-	for (var i = 0; i < GAME.level.inanimates.length; ++i) {
-		this.gameScene.removeChild(GAME.level.inanimates[i]);
+	for (var i = 0; i < GAME.level.objects.length; ++i) {
+		this.gameScene.removeChild(GAME.level.objects[i]);
 	}
 	for (var i = 0; i < GAME.level.monsters.length; ++i) {
 		this.gameScene.removeChild(GAME.level.monsters[i].healthbar.view);
@@ -88,8 +88,8 @@ GAME.View.prototype.createScene = function()
 	for (var i = 0; i < GAME.level.monsters.length; ++i) {
 		this.gameScene.addChild(GAME.level.monsters[i].view);
 	}
-	for (var i = 0; i < GAME.level.inanimates.length; ++i) {
-		this.gameScene.addChild(GAME.level.inanimates[i]);
+	for (var i = 0; i < GAME.level.objects.length; ++i) {
+		this.gameScene.addChild(GAME.level.objects[i]);
 	}
 	for (var i = 0; i < GAME.level.monsters.length; ++i) {
 		this.gameScene.addChild(GAME.level.monsters[i].healthbar.view);

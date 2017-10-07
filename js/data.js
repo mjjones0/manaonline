@@ -12,7 +12,7 @@ GAME.BUCKLER = 5;
 
 GAME.EXIT_WELL = 0;
 GAME.RECOVERY_WELL = 1;
-GAME.INANIMATE = 2;
+GAME.OBJECT = 2;
 GAME.MONSTER = 3;
 GAME.ITEM = 4;
 GAME.SPAWN_POINT = 5;
@@ -27,6 +27,8 @@ GAME.PER_LEVEL =
 	EXP_MULTIPLIER: 2,
 	HEALTH: 10
 }
+
+GAME.SONGS = ['path', 'dungeon', 'boss'];
 
 GAME.PLAYER_BASE =
 {
@@ -104,11 +106,8 @@ GAME.LEVELS['demo_room_0'] =
 		Y: 300,
 		TYPE: GAME.EXIT_WELL,
 		NEXT: 'demo_room_1',
-		COST: 0,
-		COMBAT_LOCKED: true,
 		DEST_X: 50,
 		DEST_Y: 300,
-		ACTIVE: true,
 		TEXTURE: "img/exit.png"
 	},
 	{
@@ -131,25 +130,25 @@ GAME.LEVELS['demo_room_0'] =
 	{
 		X: 325,
 		Y: 10,
-		TYPE: GAME.INANIMATE,
+		TYPE: GAME.OBJECT,
 		TEXTURE: "img/bush.png"
 	},
 	{
 		X: 650,
 		Y: 170,
-		TYPE: GAME.INANIMATE,
+		TYPE: GAME.OBJECT,
 		TEXTURE: "img/bush.png"
 	},
 	{
 		X: 650,
 		Y: 340,
-		TYPE: GAME.INANIMATE,
+		TYPE: GAME.OBJECT,
 		TEXTURE: "img/bush.png"
 	},
 	{
 		X: 325,
 		Y: 500,
-		TYPE: GAME.INANIMATE,
+		TYPE: GAME.OBJECT,
 		TEXTURE: "img/bush.png"
 	},
 	],
@@ -238,25 +237,25 @@ GAME.LEVELS['demo_room_1'] =
 	{
 		X: 325,
 		Y: 10,
-		TYPE: GAME.INANIMATE,
+		TYPE: GAME.OBJECT,
 		TEXTURE: "img/bush.png"
 	},
 	{
 		X: 5,
 		Y: 170,
-		TYPE: GAME.INANIMATE,
+		TYPE: GAME.OBJECT,
 		TEXTURE: "img/bush.png"
 	},
 	{
 		X: 5,
 		Y: 340,
-		TYPE: GAME.INANIMATE,
+		TYPE: GAME.OBJECT,
 		TEXTURE: "img/bush.png"
 	},
 	{
 		X: 325,
 		Y: 500,
-		TYPE: GAME.INANIMATE,
+		TYPE: GAME.OBJECT,
 		TEXTURE: "img/bush.png"
 	},
 	],
