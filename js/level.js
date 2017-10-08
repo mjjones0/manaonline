@@ -207,6 +207,29 @@ GAME.Level.prototype.showTitle = function(title, showDuration, fadeDuration)
 	}, showDuration * 1000);
 }
 
+GAME.Level.prototype.levelCollide = function(tileRect) 
+{
+	var colMin = Math.floor(tileRect.x / this.TW);
+	var colMax = Math.floor((tileRect.x + tileRect.width) / this.TW);
+	
+	var rowMin = Math.floor(tileRect.y / this.TH);
+	var rowMax = Math.floor((tileRect.y + tileRect.height) / this.TH);
+	
+	if (colMax > this.cols - 1 || rowMax > this.rows - 1 || colMin < 0 || rowMin < 0) {
+		return true;
+	}
+	
+	for (var i = rowMin; i <= rowMax; ++i) {
+		for (var j = colMin; j <= colMax; ++j) {
+			if (this.collisions[i][j] == 1) {
+				return true;
+			}
+		}
+	}
+	
+	return false;
+}
+
 GAME.Level.prototype.moveAndCollidePlayerX = function() 
 {
 	// move player X -> if we collide into a block, undo
@@ -256,44 +279,9 @@ GAME.Level.prototype.moveAndCollidePlayerX = function()
 		}
 	}
 	
-	//contain(GAME.player, this.bounds);
-	
 	if (this.levelCollide(GAME.player.tileBounds)) {
 		GAME.player.backout();
 	}
-	
-	contain(GAME.player, this.bounds);
-}
-
-GAME.Level.prototype.levelCollide = function(tileRect) 
-{
-	// get tiles bounded by player's tileBounds
-	var colMin = Math.floor(tileRect.x / this.TW);
-	var colMax = Math.floor((tileRect.x + tileRect.width) / this.TW);
-	
-	var rowMin = Math.floor(tileRect.y / this.TH);
-	var rowMax = Math.floor((tileRect.y + tileRect.height) / this.TH);
-	
-	if (colMin < 0) colMin = 0;
-	if (rowMin < 0) rowMin = 0;
-	
-	if (colMax > this.COLS - 1) {
-		colMax = this.COLS - 1;
-	}
-	
-	if (rowMax > this.ROWS - 1) {
-		rowMax = this.ROWS - 1;
-	}
-	
-	for (var i = rowMin; i <= rowMax; ++i) {
-		for (var j = colMin; j <= colMax; ++j) {
-			if (this.collisions[i][j] == 1) {
-				return true;
-			}
-		}
-	}
-	
-	return false;
 }
 
 GAME.Level.prototype.moveAndCollidePlayerY = function()
@@ -352,8 +340,6 @@ GAME.Level.prototype.moveAndCollidePlayerY = function()
 	if (this.levelCollide(GAME.player.tileBounds)) {
 		GAME.player.backout();
 	}
-	
-	contain(GAME.player, this.bounds);
 }
 
 GAME.Level.prototype.moveAndCollideMonsters = function()
@@ -363,22 +349,16 @@ GAME.Level.prototype.moveAndCollideMonsters = function()
 		
 		if (!this.monsters[i].alive) continue;
 		
-		// if we escape level, undo and change direction
-		if (contain(this.monsters[i], this.bounds)) {
-			this.monsters[i].changeDirection();
-			continue;
+		// check for attacking player
+		if (GAME.player.attacking && hitTestRectangle(GAME.player.slashBounds, this.monsters[i].bounds) &&
+			GAME.player.middleOfSlash()) {
+			this.monsters[i].getHit(GAME.player.calculateHit(this.monsters[i]));
 		}
 		
 		if (this.levelCollide(this.monsters[i].bounds)) {
 			this.monsters[i].backout();
 			this.monsters[i].changeDirection();
 			continue;
-		}
-		
-		// check for attacking player
-		if (GAME.player.attacking && hitTestRectangle(GAME.player.slashBounds, this.monsters[i].bounds) &&
-			GAME.player.middleOfSlash()) {
-			this.monsters[i].getHit(GAME.player.calculateHit(this.monsters[i]));
 		}
 		
 		// if we hit the player, undo

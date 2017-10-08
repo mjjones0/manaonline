@@ -6,6 +6,7 @@ GAME.Engine = function()
 	GAME.level = new GAME.Level(this);
 	GAME.input = new GAME.Input();
 	GAME.audio = new GAME.Audio();
+	GAME.ai = new GAME.AIBehavior();
 
 	this.view = new GAME.View(this);
 }

@@ -17,6 +17,7 @@ GAME.Enemy = function(name)
 	this.name = data.NAME;
 	this.exp = data.EXP;
 	this.health = data.HEALTH;
+	this.maxHealth = data.HEALTH;
 	this.speed = data.SPEED;
 	this.loot = data.LOOT;
 	this.aggressive = data.AGGRESSIVE;
@@ -129,13 +130,13 @@ GAME.Enemy.prototype.spawnDamageText = function (text, duration, color)
 	});
 
 	var textSprite = new PIXI.Text(text, style);
-	textSprite.position.x = this.position.x;
-	textSprite.position.y = this.position.y - this.bounds.height;
 	textSprite.updateText();
 	
 	this.damageTime = 0;
 	this.damageTextDuration = duration;
 	this.damageText = new PIXI.Sprite(textSprite.texture);
+	this.damageText.position.x = this.position.x;
+	this.damageText.position.y = this.position.y - this.bounds.height;
 	
 	// tween x value
 	this.damageText.moveX = 0;
@@ -274,6 +275,13 @@ GAME.Enemy.prototype.behave = function()
 
 	// TODO - CONFIGURE BEHAVIOR ON A MONSTER TO MONSTER BASIS
 	
+	if (this.health < this.maxHealth / 2) {
+		GAME.ai.simpleRunAway(this, GAME.player);
+	} else {
+		GAME.ai.simpleCardinalPathing(this);
+	}
+	
+	/*
 	if (this.moveFramesLeft == 0) {
 		this.moveFramesLeft = randomInt(100, 200);
 		this.moveDirection = randomInt(1, 7);
@@ -294,7 +302,7 @@ GAME.Enemy.prototype.behave = function()
 		this.moveRight();
 	} else {
 		this.stop();
-	}
+	}*/
 }
 
 GAME.Enemy.prototype.updateHit = function()
