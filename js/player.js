@@ -159,6 +159,10 @@ GAME.Player = function ()
 		width: GAME.PLAYER_BASE.SLASH_HITBOX_SIZE, 
 		height: GAME.PLAYER_BASE.SLASH_HITBOX_SIZE
 	};
+	this.tileBounds = {x: this.position.x + GAME.PLAYER_BASE.TILE_OFFSET_X,
+					   y: this.position.y + GAME.PLAYER_BASE.TILE_OFFSET_Y,
+					   width: GAME.PLAYER_BASE.TILE_WIDTH,
+					   height: GAME.PLAYER_BASE.TILE_HEIGHT};
 	
 	this.healthbar = new GAME.Healthbar();
 	this.healthbar.create(0x00FF00, 1, 40, 10, 0xFF0000);
@@ -196,6 +200,9 @@ GAME.Player.prototype.setPosition = function(x, y)
 	
 	this.healthbar.view.position.x = this.position.x - this.healthbar.view.width / 2;
 	this.healthbar.view.position.y = this.position.y - this.height / 2 - this.healthbar.view.height;
+	
+	this.tileBounds.x = this.position.x + GAME.PLAYER_BASE.TILE_OFFSET_X;
+	this.tileBounds.y = this.position.y + GAME.PLAYER_BASE.TILE_OFFSET_Y;
 }
 
 GAME.Player.prototype.facingRight = function() 
@@ -324,7 +331,7 @@ GAME.Player.prototype.handleInput = function()
 	
 	if (xPressed && !this.attacking && !this.onCooldown) {
 		this.attacking = true;
-		GAME.audio.playSound('slash_1', 0.5);
+		GAME.audio.playSound('slash_1', 0.2);
 	}
 	
 	var speed = GAME.PLAYER_BASE.WALK_SPEED;
@@ -434,6 +441,9 @@ GAME.Player.prototype.backout = function()
 	
 	this.bounds.x = this.position.x - this.width / 2;
 	this.bounds.y = this.position.y - this.height / 2; 
+	
+	this.tileBounds.x = this.position.x + GAME.PLAYER_BASE.TILE_OFFSET_X;
+	this.tileBounds.y = this.position.y + GAME.PLAYER_BASE.TILE_OFFSET_Y;
 }
 
 GAME.Player.prototype.move = function(x, y)
@@ -454,6 +464,9 @@ GAME.Player.prototype.move = function(x, y)
 	
 	this.healthbar.view.position.x = this.position.x - this.healthbar.view.width / 2;
 	this.healthbar.view.position.y = this.position.y - this.height / 2 - this.healthbar.view.height;
+	
+	this.tileBounds.x = this.position.x + GAME.PLAYER_BASE.TILE_OFFSET_X;
+	this.tileBounds.y = this.position.y + GAME.PLAYER_BASE.TILE_OFFSET_Y;
 }
 
 GAME.Player.prototype.calculateHit = function(monster)

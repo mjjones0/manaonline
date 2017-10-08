@@ -20,6 +20,10 @@ GAME.Level.prototype.load = function(name, spawnX, spawnY)
 	this.width = data.BG_WIDTH;
 	this.height = data.BG_HEIGHT;
 	
+	this.fg = new Sprite(resources[data.FOREGROUND].texture);
+	this.fg.width = data.BG_WIDTH;
+	this.fg.height = data.BG_HEIGHT;
+	
 	// music
 	this.song = data.SONG;
 	
@@ -63,6 +67,13 @@ GAME.Level.prototype.load = function(name, spawnX, spawnY)
 		GAME.player.setPosition(this.spawn.x, this.spawn.y);
 	}
 	
+	// collision stuff
+	this.collisions = this.data.COLLISIONS;
+	this.rows = this.data.ROWS;
+	this.cols = this.data.COLS;
+	this.TW = this.data.TW;
+	this.TH = this.data.TH;
+	
 	this.bounds = {
         x: 0,
         y: 0,
@@ -74,7 +85,7 @@ GAME.Level.prototype.load = function(name, spawnX, spawnY)
 	
 	this.engine.view.createScene();
 	
-	this.showTitle(GAME.LEVELS[name].TITLE, 3, 0.5);
+	this.showTitle(GAME.LEVELS[name].NAME, 3, 0.5);
 }
 
 GAME.Level.prototype.changeLevel = function(name, x, y, duration)
@@ -84,6 +95,10 @@ GAME.Level.prototype.changeLevel = function(name, x, y, duration)
 	});
 	GAME.player.movementDisabled = true;
 	GAME.player.view.stop();
+	
+	if (this.titleContainer) {
+		this.engine.view.hud.removeChild(this.titleContainer);
+	}
 	
 	var engine = this.engine;
 	var level = this;
@@ -176,6 +191,8 @@ GAME.Level.prototype.showTitle = function(title, showDuration, fadeDuration)
 	var hud = this.engine.view.hud;
 	hud.addChild(titleContainer);
 	
+	this.titleContainer = titleContainer;
+	
 	// transition out
 	setTimeout(function () {
 		TweenLite.to(titleContainer, fadeDuration, {
@@ -230,7 +247,7 @@ GAME.Level.prototype.moveAndCollidePlayerX = function()
 				}
 				
 				// if we push them out of bounds, undo everything
-				if (out_of_bounds(this.monsters[i], this.bounds)) {
+				if (this.levelCollide(this.monsters[i].bounds)) {
 					GAME.player.backout();
 					this.monsters[i].backout();
 					return;
@@ -239,7 +256,44 @@ GAME.Level.prototype.moveAndCollidePlayerX = function()
 		}
 	}
 	
+	//contain(GAME.player, this.bounds);
+	
+	if (this.levelCollide(GAME.player.tileBounds)) {
+		GAME.player.backout();
+	}
+	
 	contain(GAME.player, this.bounds);
+}
+
+GAME.Level.prototype.levelCollide = function(tileRect) 
+{
+	// get tiles bounded by player's tileBounds
+	var colMin = Math.floor(tileRect.x / this.TW);
+	var colMax = Math.floor((tileRect.x + tileRect.width) / this.TW);
+	
+	var rowMin = Math.floor(tileRect.y / this.TH);
+	var rowMax = Math.floor((tileRect.y + tileRect.height) / this.TH);
+	
+	if (colMin < 0) colMin = 0;
+	if (rowMin < 0) rowMin = 0;
+	
+	if (colMax > this.COLS - 1) {
+		colMax = this.COLS - 1;
+	}
+	
+	if (rowMax > this.ROWS - 1) {
+		rowMax = this.ROWS - 1;
+	}
+	
+	for (var i = rowMin; i <= rowMax; ++i) {
+		for (var j = colMin; j <= colMax; ++j) {
+			if (this.collisions[i][j] == 1) {
+				return true;
+			}
+		}
+	}
+	
+	return false;
 }
 
 GAME.Level.prototype.moveAndCollidePlayerY = function()
@@ -286,13 +340,17 @@ GAME.Level.prototype.moveAndCollidePlayerY = function()
 				}
 				
 				// if we push them out of bounds, undo everything
-				if (out_of_bounds(this.monsters[i], this.bounds)) {
+				if (this.levelCollide(this.monsters[i].bounds)) {
 					GAME.player.backout();
 					this.monsters[i].backout();
 					return;
 				}
 			}
 		}
+	}
+	
+	if (this.levelCollide(GAME.player.tileBounds)) {
+		GAME.player.backout();
 	}
 	
 	contain(GAME.player, this.bounds);
@@ -307,6 +365,12 @@ GAME.Level.prototype.moveAndCollideMonsters = function()
 		
 		// if we escape level, undo and change direction
 		if (contain(this.monsters[i], this.bounds)) {
+			this.monsters[i].changeDirection();
+			continue;
+		}
+		
+		if (this.levelCollide(this.monsters[i].bounds)) {
+			this.monsters[i].backout();
 			this.monsters[i].changeDirection();
 			continue;
 		}
@@ -347,29 +411,7 @@ GAME.Level.prototype.collideWithExit = function()
 	
 		if (hitTestRectangle(GAME.player.bounds, exitRect) && 
 			rectContains(exitRect, GAME.player.bounds.x + GAME.player.bounds.width / 2, GAME.player.bounds.y + GAME.player.bounds.height * 0.75)) {
-			
-			// check if cost is met
-			var costMet = false;
-			
-			if (this.exits_data[i].COST < 1) {
-				costMet = true;
-			} else {
-				if ('light_crystal' in GAME.player.inventory) {
-					if (this.exits_data[i].COST <= GAME.player.inventory['light_crystal'].quantity) {
-						costMet = true;
-					} else {
-						costMet = false;
-					}
-				}
-			}
-			
-			// change level fade out etc
-			if (costMet) {
-				// LATER - if so, set cost met flag and position for view to userAgent
-				
-				// fade into new level
-				this.changeLevel(this.exits_data[i].NEXT, this.exits_data[i].DEST_X, this.exits_data[i].DEST_Y, 500);
-			}
+			this.changeLevel(this.exits_data[i].NEXT, this.exits_data[i].DEST_X, this.exits_data[i].DEST_Y, 500);
 		}
 	};
 }

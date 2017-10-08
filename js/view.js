@@ -91,6 +91,7 @@ GAME.View.prototype.createScene = function()
 	for (var i = 0; i < GAME.level.objects.length; ++i) {
 		this.gameScene.addChild(GAME.level.objects[i]);
 	}
+	this.gameScene.addChild(GAME.level.fg);
 	for (var i = 0; i < GAME.level.monsters.length; ++i) {
 		this.gameScene.addChild(GAME.level.monsters[i].healthbar.view);
 	}
@@ -110,6 +111,9 @@ GAME.View.prototype.moveCamera = function()
 {
 	var scaledWidthHalved = GAME.BASEWIDTH / GAME.SCALE_X / 2.0;
 	var scaledHeightHalved = GAME.BASEHEIGHT / GAME.SCALE_Y / 2.0;
+	
+	var zoomWidth = GAME.BASEWIDTH / GAME.SCALE_X;
+	var zoomHeight = GAME.BASEHEIGHT / GAME.SCALE_Y;
 
 	var stageWidth = GAME.level.width;
 	var stageHeight = GAME.level.height;
@@ -139,6 +143,16 @@ GAME.View.prototype.moveCamera = function()
 		this.gameScene.position.y = 0;
 	} else {
 		this.gameScene.position.y = (fovY - (stageHeight - fovY)) * GAME.SCALE_Y;
+	}
+	
+	if (stageWidth <= scaledWidthHalved * 2.0) {
+		var diffHalved = (scaledWidthHalved * 2.0 - stageWidth) / 2.0;
+		this.gameScene.position.x = diffHalved * this.gameScene.scale.x;
+	}
+	
+	if (stageHeight <= scaledHeightHalved * 2.0) {
+		var diffHalved = (scaledHeightHalved * 2.0 - stageHeight) / 2.0;
+		this.gameScene.position.y = diffHalved * this.gameScene.scale.y;
 	}
 }
 

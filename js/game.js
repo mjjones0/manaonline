@@ -30,7 +30,11 @@ function load() {
 		"img/keyboard_z_pressed.png",
 		"img/keyboard_x_pressed.png",
 		"img/attack_icon.png",
-		"img/monster_death.json"
+		"img/monster_death.json",
+		"img/foreground_forest_1.png",
+		"img/foreground_forest_0.png",
+		"img/background_forest_1.png",
+		"img/background_forest_0.png"
 	  ])
 	  .load(init);
 }

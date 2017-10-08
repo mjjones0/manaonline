@@ -242,7 +242,7 @@ function addEntity() {
 function save() {
 	// grab entities from the in-memory structure
 	for (var key in entitySprites) {
-		if (entitySprites.hasOwnProperty(key)) {
+		if (entitySprites.hasOwnProperty(key) && entitySprites[key]) {
 			level.ENTITIES.push(getEntityObject(entitySprites[key]));
 		}
 	}

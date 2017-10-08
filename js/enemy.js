@@ -156,7 +156,7 @@ GAME.Enemy.prototype.getHit = function(damage)
 	if (this.dying || !this.alive) return;
 	
 	if (!this.isHit) {
-		GAME.audio.playSound('slashed_1', 0.5);
+		GAME.audio.playSound('slashed_1', 0.2);
 		this.spawnDamageText(damage.toString(), 0.75, 0xFFFF00);
 		console.log("DAMAGE TEXT SPAWNED");
 	}
@@ -338,7 +338,7 @@ GAME.Enemy.prototype.die = function()
 	
 	var monster = this;
 	
-	GAME.audio.playSound('monster_death_1', 0.5);
+	GAME.audio.playSound('monster_death_1', 0.2);
 	
 	this.healthbar.view.alpha = 0;
 	

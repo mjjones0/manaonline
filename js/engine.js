@@ -12,7 +12,7 @@ GAME.Engine = function()
 
 GAME.Engine.prototype.start = function()
 {
-	GAME.level.load('demo_room_0');
+	GAME.level.load('forest_coast');
 }
 
 GAME.Engine.prototype.update = function()
