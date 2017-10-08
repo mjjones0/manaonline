@@ -20,6 +20,8 @@ var OnScreenAttack;
 var OnScreenZ;
 var OnScreenX;
 
+var gamepadOn = false;
+
 GAME.Input = function()
 {
 	setup_inputs();
@@ -29,6 +31,17 @@ GAME.Input = function()
 	} else {
 		setup_keyboard_buttons();
 	}
+
+	if(!!navigator.getGamepads){
+	    // Browser supports the Gamepad API
+	    	window.addEventListener("gamepadconnected", function(e) {
+	  var gp = navigator.getGamepads()[e.gamepad.index];
+	  console.log("Gamepad connected at index %d: %s. %d buttons, %d axes.",
+	    gp.index, gp.id,
+	    gp.buttons.length, gp.axes.length);
+	});
+	}
+
 }
 
 GAME.Input.constructor = GAME.Input;
@@ -229,4 +242,51 @@ function setup_keyboard_buttons() {
 	OnScreenX.y = GAME.BASEHEIGHT - OnScreenX.height - 6;
 }
 
+function check_gamepad(){
+	var gp = navigator.getGamepads()[0];
+	if(!gamepadOn){
+		if(!gp) return;
+		if(gp.axes[0] > 0.5 || gp.axes[0] < -0.5 || gp.axes[1] > 0.5 || gp.axes[1] < -0.5 ){
+			gamepadOn = true;
+		}
+		if(!gamepadOn){
+			return;
+		}
+	}
+    var axeLR = gp.axes[0];
+    var axeUD = gp.axes[1];
+    var gpbZ = gp.buttons[0];
+    var gpbX = gp.buttons[2];
+
+    	up.release();
+		left.release();
+		down.release();
+		right.release();
+		x_button.release();
+		z_button.release();
+		xPressed = false;
+		zPressed = false;
+
+    if(axeLR < -0.5) {
+        left.press();
+    }
+    if(axeLR > 0.5) {
+    	right.press();
+    }
+
+    if(axeUD < -0.5) {
+        up.press();
+    }
+    if(axeUD > 0.5) {
+    	down.press();
+    }
+
+    if(gpbX.pressed){
+    	xPressed = true;
+    }
+    if(gpbZ.pressed){
+    	zPressed = true;
+    }
+
+}
 

@@ -82,6 +82,7 @@ function resize()
 }
 
 function gameLoop() {
+	check_gamepad();
     requestAnimationFrame(gameLoop);
 	
     game.update();
