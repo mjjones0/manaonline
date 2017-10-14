@@ -24,6 +24,8 @@
 						<br/><br/>
 						<button id="clear">Clear Scene</button><br/>
 						<br/><br/>
+						<p style="color: red;">Dimensions: 400x300 minimum!<br/>
+						BG and FG must be same size!</p><br/>
 						Background: <input type="file" id="loadBG"/><br/>
 						Foreground: <input type="file" id="loadFG"/><br/>
 						<br/><br/><br/><br/>
@@ -35,7 +37,18 @@
 				</td>
 				<td style="width:22%;">
 					<div id="rightContent">
-						<div id="entitySettings" style="display: none;">
+						<div id="exitSettings" style="display: none; border: 2px solid red">
+							Destination: <select id="stages"></select><br/>
+							Destination X: <input type="text" id="destX"></input><br/>
+							Destination Y: <input type="text" id="destY"></input><br/>
+							<br/>
+							Destination Exit Points for Reference: <br/>
+							<ul id="destExits">
+							</ul>
+							<br/>
+						</div>
+						<div id="objectSettings" style="display: none; border: 2px solid red">
+							Texture: <select id="objects"></select><br/>
 						</div>
 						<br/><br/>
 						Load Existing Level: <input type="file" id="loadLevel"/><br/>

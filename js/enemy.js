@@ -29,6 +29,7 @@ GAME.Enemy = function(name)
 	this.damage = 0;
 	this.moveFramesLeft = 0;
 	this.moveDirection = 0;
+	this.justStartedAnimation = true;
 	
 	this.dying = false;
 	this.alive = true;
@@ -60,6 +61,8 @@ GAME.Enemy = function(name)
 	this.healthbar.setMax(data.HEALTH);
 	this.healthbar.setCurrent(this.health);
 	this.healthbar.view.alpha = 0.5;
+	
+	//this.aura = new PIXI.Sprite(resources["img/passive_aura.png"].texture);
 }
 
 GAME.Enemy.constructor = GAME.Enemy;
@@ -115,6 +118,30 @@ GAME.Enemy.prototype.moveLeft = function()
 {
 	this.vy = 0;
 	this.vx = -this.speed;
+}
+
+GAME.Enemy.prototype.moveUpLeft = function()
+{
+	this.vy = -this.speed * GAME.ROOTTWOOVERTWO;
+	this.vx = -this.speed * GAME.ROOTTWOOVERTWO;
+}
+
+GAME.Enemy.prototype.moveUpRight = function()
+{
+	this.vy = -this.speed * GAME.ROOTTWOOVERTWO;
+	this.vx = this.speed * GAME.ROOTTWOOVERTWO;
+}
+
+GAME.Enemy.prototype.moveDownLeft = function()
+{
+	this.vy = this.speed * GAME.ROOTTWOOVERTWO;
+	this.vx = -this.speed * GAME.ROOTTWOOVERTWO;
+}
+
+GAME.Enemy.prototype.moveDownRight = function()
+{
+	this.vy = this.speed * GAME.ROOTTWOOVERTWO;
+	this.vx = this.speed * GAME.ROOTTWOOVERTWO;
 }
 
 GAME.Enemy.prototype.spawnDamageText = function (text, duration, color) 
@@ -228,7 +255,9 @@ GAME.Enemy.prototype.animate = function()
 		if (this.view.textures != newFrames) {
 			this.view.textures = newFrames;
 			this.view.gotoAndPlay(0);
+			this.justStartedAnimation = true;
 		} else {
+			this.justStartedAnimation = false;
 			this.view.play();
 		}
 	}
@@ -273,13 +302,9 @@ GAME.Enemy.prototype.behave = function()
 {
 	if (this.isHit || this.dying) return;
 
-	// TODO - CONFIGURE BEHAVIOR ON A MONSTER TO MONSTER BASIS
+	// todo - configure
 	
-	if (this.health < this.maxHealth / 2) {
-		GAME.ai.simpleRunAway(this, GAME.player);
-	} else {
-		GAME.ai.simpleCardinalPathing(this);
-	}
+	GAME.ai.simpleIntercardinalMovement(this);
 	
 	/*
 	if (this.moveFramesLeft == 0) {

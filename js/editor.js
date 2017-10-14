@@ -13,6 +13,8 @@ var level = {
 	TH: 0,
 	ROWS: 0,
 	COLS: 0,
+	BG_WIDTH: 0,
+	BG_HEIGHT: 0,
 	COLLISIONS: [],
 	ENTITIES: []
 };
@@ -40,9 +42,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
 });
 
 function init() {
+	clearForm();
 	bindEventHandlers();
 	loadEntities();
 	loadSongs();
+	loadTextures();
 
 	foregroundDisplayGroup = new PIXI.DisplayGroup(1, false);
 	backgroundDisplayGroup = new PIXI.DisplayGroup(0, false);
@@ -65,7 +69,14 @@ function init() {
 
 
 
-
+function clearForm() {
+	document.getElementById("loadFG").value = "";
+	document.getElementById("loadBG").value = "";
+	document.getElementById('tileWidth').value = 10;
+	document.getElementById('tileHeight').value = 10;
+	document.getElementById('title').value = "";
+	hideExitSettings();
+}
 
 function loadSongs() {
 	var songs = document.getElementById('songs');
@@ -76,6 +87,17 @@ function loadSongs() {
 		song.value = GAME.SONGS[i];
 		song.innerHTML = GAME.SONGS[i];
 		songs.appendChild(song);
+	}
+}
+
+function loadTextures() {
+	var objects = document.getElementById('objects');
+	
+	for (var i = 0; i < GAME.OBJECTS.length; ++i) {
+		var obj = document.createElement('option');
+		obj.value = GAME.OBJECTS[i];
+		obj.innerHTML = GAME.OBJECTS[i];
+		objects.appendChild(obj);
 	}
 }
 
@@ -144,6 +166,8 @@ function loadBG(){
 		
 	var onLoaded = function () {
 		background = new PIXI.Sprite(PIXI.Texture.fromImage(path));
+		level.BG_WIDTH = background.width;
+		level.BG_HEIGHT = background.height;
 		scaleToStage(background);
 		levelScaleX = background.scale.x;
 		levelScaleY = background.scale.y;
@@ -218,12 +242,6 @@ function addEntity() {
 	
 	// bind event handlers to it
 	subscribe(entitySprite);
-	entitySprite.on('contextmenu', function(ev) {
-		ev.preventDefault();
-		entitySprites[entitySprite.id] = undefined; // store 
-		app.stage.removeChild(entitySprite);
-		return false;
-	}, false);
 	
 	// move into center
 	entitySprite.position.x = (app.stage.width / 2 - entitySprite.width / 2);
@@ -234,9 +252,9 @@ function addEntity() {
 		entitySprite.scale.y = levelScaleY;
 	}
 	
-	app.stage.addChild(entitySprite);
+	displayEntitySettings(entitySprite, entityDescriptor);
 	
-	// display entity form on top right of editor (trigger entityOnPointerDown)
+	app.stage.addChild(entitySprite);
 }
 
 function save() {
@@ -279,12 +297,7 @@ function clear() {
 	
 	editorState = DEFAULT;
 	
-	document.getElementById("loadFG").value = "";
-	document.getElementById("loadBG").value = "";
-	document.getElementById('tileWidth').value = 10;
-	document.getElementById('tileHeight').value = 10;
-	document.getElementById('title').value = "";
-	document.getElementById('song').value = "";
+	clearForm();
 	
 	grid = undefined;
 	tiles = undefined;
@@ -293,12 +306,99 @@ function clear() {
 
 
 
+function hideObjectSettings() {
+	document.getElementById('objectSettings').style.display = 'none';
+}
 
+function showObjectSettings(entity) {
+	document.getElementById('objectSettings').style.display = 'block';
+	
+	document.getElementById('objects').addEventListener('change', function () {
+		var object = document.getElementById('objects').value;
+		entity.textureName = object;
+		console.log(entity.textureName);
+	}, false);
+}
 
+function showExitSettings(entity) {
+	// show exit settings block
+	document.getElementById('exitSettings').style.display = 'block';
 
+	// remove old stages shown
+	var stages = document.getElementById('stages');
+	stages.innerHTML = "";
+	
+	// add stages from data
+	for (var key in GAME.LEVELS) {
+		if (GAME.LEVELS.hasOwnProperty(key)) {
+			var stage = document.createElement('option');
+			stage.value = key;
+			stage.innerHTML = GAME.LEVELS[key].NAME;
+			stages.appendChild(stage);
+		}
+	}
+	
+	// set values if they're present on the entity
+	document.getElementById('destX').value = entity.destX;
+	document.getElementById('destY').value = entity.destY;
+	if (entity.destStage) {
+		stages.value = entity.destStage;
+	}
+	
+	// bind event handlers to mutate the entity's settings
+	document.getElementById('destX').oninput = function () {
+		var value = document.getElementById('destX').value;
+		
+		if (!parseInt(value, 10)) {
+			alert("DEST X MUST BE A NUMBER");
+			return;
+		}
+		
+		entity.destX = parseInt(value, 10);
+		
+		console.log(entity.destX);
+	};
+	document.getElementById('destY').oninput = function () {
+		var value = document.getElementById('destY').value;
+		
+		if (!parseInt(value, 10)) {
+			alert("DEST Y MUST BE A NUMBER");
+			return;
+		}
+		
+		entity.destY = parseInt(value, 10);
+		
+		console.log(entity.destY);
+	};
+	document.getElementById('stages').addEventListener('change', function () {
+		showDestExits();
+		var stage = document.getElementById('stages').value;
+		entity.destStage = stage;
+		
+		console.log(entity.destStage);
+	}, false);
+}
 
+function hideExitSettings() {
+	document.getElementById('exitSettings').style.display = 'none';
+}
 
-
+function showDestExits() {
+	var stage = document.getElementById('stages').value;
+	
+	var exits = document.getElementById('destExits');
+	exits.innerHTML = "";
+	
+	var level = GAME.LEVELS[stage];
+	for (var i = 0; i < level.ENTITIES.length; ++i) {
+		if (level.ENTITIES[i].TYPE == GAME.EXIT_WELL) {
+			var exit = document.createElement('li');
+			exit.innerHTML = "Next: " + level.ENTITIES[i].NEXT + ", X: " + level.ENTITIES[i].X + 
+							 ", Y: " + level.ENTITIES[i].Y;
+			exits.appendChild(exit);
+		}
+	}
+}
 
 function getEntityObject(entity) {
 	// convert coords to level space
@@ -325,8 +425,8 @@ function getEntityObject(entity) {
 
 function getMonsterObject(entityName, x, y) {
 	return {
-		X: x,
-		Y: y,
+		X: Math.floor(x),
+		Y: Math.floor(y),
 		TYPE: GAME.MONSTER,
 		ID: entityName
 	};
@@ -334,16 +434,16 @@ function getMonsterObject(entityName, x, y) {
 
 function getSpawnPointObject(x, y) {
 	return {
-		X: x,
-		Y: y,
+		X: Math.floor(x),
+		Y: Math.floor(y),
 		TYPE: GAME.SPAWN_POINT
 	};
 }
 
 function getGenericObject(textureName, x, y) {
 	return {
-		X: x,
-		Y: y,
+		X: Math.floor(x),
+		Y: Math.floor(y),
 		TYPE: GAME.OBJECT,
 		TEXTURE: textureName
 	};
@@ -351,12 +451,12 @@ function getGenericObject(textureName, x, y) {
 
 function getExitPointObject(destX, destY, destStage, x, y) {
 	return {
-		X: x,
-		Y: y,
+		X: Math.floor(x),
+		Y: Math.floor(y),
 		TYPE: GAME.EXIT_WELL,
 		NEXT: destStage,
-		DEST_X: destX,
-		DEST_Y: destY,
+		DEST_X: Math.floor(destX),
+		DEST_Y: Math.floor(destY),
 		TEXTURE: "img/exit.png"
 	};
 }
@@ -501,13 +601,18 @@ function editorOnPointerDown(eventData) {
 	}
 }
 
+function displayEntitySettings(entity, type) {
+	hideExitSettings();
+	hideObjectSettings();
+	if (type == "exit") showExitSettings(entity);
+	if (type == "object") showObjectSettings(entity);
+}
+
 function onDragStart(event) {
     if (!this.dragging) {
         this.data = event.data;
-        //this.oldGroup = this.displayGroup;
-        //this.displayGroup = dragLayer;
         this.dragging = true;
-
+		displayEntitySettings(this, this.entityType);
         this.scale.x *= 1.1;
         this.scale.y *= 1.1;
         this.dragPoint = event.data.getLocalPosition(this.parent);
@@ -519,10 +624,8 @@ function onDragStart(event) {
 function onDragEnd() {
     if (this.dragging) {
         this.dragging = false;
-        //this.displayGroup = this.oldGroup;
         this.scale.x /= 1.1;
         this.scale.y /= 1.1;
-        // set the interaction data to null
         this.data = null;
     }
 }
@@ -536,7 +639,6 @@ function onDragMove() {
 		if ((this.x < -10) || (this.y < -10) || (this.x > DEFAULT_WIDTH + 10 || this.y > DEFAULT_HEIGHT + 10)) {
 			entitySprites[this.id] = undefined;
 			app.stage.removeChild(this);
-			console.log("DESTROYED!");
 		}
     }
 }

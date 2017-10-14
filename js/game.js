@@ -34,7 +34,10 @@ function load() {
 		"img/foreground_forest_1.png",
 		"img/foreground_forest_0.png",
 		"img/background_forest_1.png",
-		"img/background_forest_0.png"
+		"img/background_forest_0.png",
+		"img/foreground_forest_statue.png",
+		"img/background_forest_statue.png",
+		"img/passive_aura.png"
 	  ])
 	  .load(init);
 }

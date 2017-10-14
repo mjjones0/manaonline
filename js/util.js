@@ -42,10 +42,6 @@ function contain(sprite, container) {
     return collision;
 }
 
-function contain_pixels(sprite, container) {
-
-}
-
 function out_of_bounds(sprite, container) {
     //Left
     if (sprite.bounds.x < container.x) {
