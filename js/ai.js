@@ -169,3 +169,13 @@ GAME.AIBehavior.prototype.simpleIntercardinalMovement = function (monster)
 		monster.stop();
 	}
 }
+
+
+GAME.AIBehavior.prototype.pathTowardPlayerAStar = function (monster, player, level)
+{
+	// generate A* if not already done some
+	
+	// adjust based on current positions
+	
+	// change velocity
+}

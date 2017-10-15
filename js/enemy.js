@@ -304,30 +304,7 @@ GAME.Enemy.prototype.behave = function()
 
 	// todo - configure
 	
-	GAME.ai.simpleIntercardinalMovement(this);
-	
-	/*
-	if (this.moveFramesLeft == 0) {
-		this.moveFramesLeft = randomInt(100, 200);
-		this.moveDirection = randomInt(1, 7);
-		if (this.moveDirection > 4) {
-			this.moveFramesLeft = 60;
-		}
-	} else {
-		--this.moveFramesLeft;
-	}
-	
-	if (this.moveDirection == 1) {
-		this.moveUp();
-	} else if (this.moveDirection == 2) {
-		this.moveLeft();
-	} else if (this.moveDirection == 3) {
-		this.moveDown();
-	} else if (this.moveDirection == 4) {
-		this.moveRight();
-	} else {
-		this.stop();
-	}*/
+	GAME.ai.simpleAggress(this, GAME.player);
 }
 
 GAME.Enemy.prototype.updateHit = function()
