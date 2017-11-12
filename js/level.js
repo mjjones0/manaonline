@@ -15,8 +15,8 @@ GAME.Level.prototype.load = function(name, spawnX, spawnY)
 	
 	// background
 	this.bg = new Sprite(resources[data.BACKGROUND].texture);
-    this.bg.width = data.BG_WIDTH;
-    this.bg.height = data.BG_HEIGHT;
+  this.bg.width = data.BG_WIDTH;
+  this.bg.height = data.BG_HEIGHT;
 	this.width = data.BG_WIDTH;
 	this.height = data.BG_HEIGHT;
 	
@@ -46,7 +46,7 @@ GAME.Level.prototype.load = function(name, spawnX, spawnY)
 			this.objects.push(object);
 			this.objects_data.push(entity);
 		} else if (entity.TYPE == GAME.MONSTER) {
-			var monster = new GAME.Enemy(entity.ID);
+			var monster = new GAME.Enemy(entity.ID, entity.AGGRESSIVE);
 			monster.setPosition(entity.X, entity.Y);
 			this.monsters.push(monster);
 			this.monsters_data.push(entity);
@@ -75,11 +75,11 @@ GAME.Level.prototype.load = function(name, spawnX, spawnY)
 	this.TH = this.data.TH;
 	
 	this.bounds = {
-        x: 0,
-        y: 0,
-        width: this.data.BG_WIDTH,
+		x: 0,
+		y: 0,
+		width: this.data.BG_WIDTH,
 		height: this.data.BG_HEIGHT
-    };
+  };
 	
 	GAME.audio.playMusic(this.song, true, 0.3);
 	
@@ -88,7 +88,7 @@ GAME.Level.prototype.load = function(name, spawnX, spawnY)
 	this.showTitle(GAME.LEVELS[name].NAME, 3, 0.5);
 }
 
-GAME.Level.prototype.changeLevel = function(name, x, y, duration)
+GAME.Level.prototype.changeLevel = function(name, duration, x, y)
 {
 	this.monsters.forEach(function (monster) {
 		monster.movementDisabled = true;
@@ -122,6 +122,7 @@ GAME.Level.prototype.changeLevel = function(name, x, y, duration)
 				monsters.forEach(function (monster) {
 					monster.movementDisabled = false;
 				});
+				
 				GAME.player.movementDisabled = false;
 				GAME.player.view.play();
 				
@@ -245,6 +246,14 @@ GAME.Level.prototype.moveAndCollidePlayerX = function()
 	// for each monster
 	for (var i = 0; i < this.monsters.length; ++i) {
 		if (!this.monsters[i].alive) continue;
+		
+		// attack collision has wider bounds than other collisions
+		if (this.monsters[i].attacking && hitTestRectangle(GAME.player.bounds, this.monsters[i].view)) {
+			var damage = this.monsters[i].calculateHit(GAME.player);
+			console.log("DAMAGED BY " + damage);
+			GAME.player.getHit(damage);
+		}
+		
 		// if we collide
 		if (hitTestRectangle(GAME.player.bounds, this.monsters[i].bounds)) {
 			// if monster is heavy, stop
@@ -300,6 +309,13 @@ GAME.Level.prototype.moveAndCollidePlayerY = function()
 	// for each monster
 	for (var i = 0; i < this.monsters.length; ++i) {
 		if (!this.monsters[i].alive) continue;
+		
+		// attack collision has wider bounds than other collisions
+		if (this.monsters[i].attacking && hitTestRectangle(GAME.player.bounds, this.monsters[i].view)) {
+			var damage = this.monsters[i].calculateHit(GAME.player);
+			console.log("DAMAGED BY " + damage);
+			GAME.player.getHit(damage);
+		}
 		
 		// if we collide
 		if (hitTestRectangle(GAME.player.bounds, this.monsters[i].bounds)) {
@@ -391,7 +407,7 @@ GAME.Level.prototype.collideWithExit = function()
 	
 		if (hitTestRectangle(GAME.player.bounds, exitRect) && 
 			rectContains(exitRect, GAME.player.bounds.x + GAME.player.bounds.width / 2, GAME.player.bounds.y + GAME.player.bounds.height * 0.75)) {
-			this.changeLevel(this.exits_data[i].NEXT, this.exits_data[i].DEST_X, this.exits_data[i].DEST_Y, 500);
+			this.changeLevel(this.exits_data[i].NEXT, 500, this.exits_data[i].DEST_X, this.exits_data[i].DEST_Y);
 		}
 	};
 }

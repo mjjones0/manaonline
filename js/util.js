@@ -173,6 +173,31 @@ function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function distanceSquared(entity0, entity1) {
+	var xdiff = entity1.position.x - entity0.position.x;
+	var ydiff = entity1.position.y - entity0.position.y;
+	
+	return xdiff * xdiff + ydiff * ydiff;
+}
+
+function directionToward(entity0, entity1) {
+	var angle = Math.atan2(entity1.position.y - entity0.position.y, entity1.position.x - entity0.position.x) * GAME.RADIANSTOANGLE;
+	
+	// right
+	if (angle > -45 && angle < 45) {
+		return "right";
+	} else if (angle < -45 && angle > -135) {
+		return "up";
+	// left
+	} else if (angle < -135 || angle > 135) {
+		return "left";
+	} else if (angle < 135 && angle > 45) {
+		return "down";
+	}
+	
+	alert("ERROR!");
+}
+
 function keyboard(keyCode) {
     var key = {};
     key.code = keyCode;

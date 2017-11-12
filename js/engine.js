@@ -11,6 +11,15 @@ GAME.Engine = function()
 	this.view = new GAME.View(this);
 }
 
+GAME.Engine.prototype.gameOver = function() 
+{
+	setTimeout(function() {	
+		// don't give coords so it will use spawn point coords
+		GAME.level.changeLevel('forest_coast', 2000);
+		GAME.player.reset();
+	}, 500);
+}
+
 GAME.Engine.prototype.start = function()
 {
 	GAME.level.load('forest_coast');

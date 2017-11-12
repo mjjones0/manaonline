@@ -1,6 +1,6 @@
 "use strict";
 
-GAME.Enemy = function(name) 
+GAME.Enemy = function(name, aggressive) 
 {
 	var data = GAME.MONSTERS[name];
 	if (!data) { alert('no data for monster: ' + name); }
@@ -14,17 +14,21 @@ GAME.Enemy = function(name)
 	this.isHit = false;
 	this.hitTime = 0.0;
 	
+	this.key = name;
 	this.name = data.NAME;
 	this.exp = data.EXP;
 	this.health = data.HEALTH;
 	this.maxHealth = data.HEALTH;
+	this.range = data.RANGE;
 	this.speed = data.SPEED;
 	this.loot = data.LOOT;
-	this.aggressive = data.AGGRESSIVE;
+	this.aggressive = aggressive;
 	this.attack = data.ATTACK;
 	this.defense = data.DEFENSE;
 	this.heavy = data.HEAVY;
 	this.stunDuration = data.STUN_DURATION;
+	this.basicAttackCooldown = data.BASIC_ATTACK_COOLDOWN;
+	this.behavior = GAME.monster_behaviors[(this.aggressive ? this.name + "_aggressive" : this.name + "_passive")];
 	
 	this.damage = 0;
 	this.moveFramesLeft = 0;
@@ -67,33 +71,22 @@ GAME.Enemy = function(name)
 
 GAME.Enemy.constructor = GAME.Enemy;
 
-GAME.Enemy.prototype.reset = function(x, y)
-{
-	this.position.x = 0;
-	this.position.y = 0;
-    this.vx = 0;
-    this.vy = 0;
-	this.move(x - this.width / 2, y - this.height / 2);
-}
-
 GAME.Enemy.prototype.setPosition = function(x, y)
 {
 	this.previous.x = this.position.x;
 	this.previous.y = this.position.y;
+	
 	this.position.x = x;
 	this.position.y = y;
+	
 	this.view.position.x = this.position.x;
 	this.view.position.y = this.position.y;
+	
 	this.bounds.x = this.position.x - this.width / 2;
 	this.bounds.y = this.position.y - this.height / 2;
+	
 	this.healthbar.view.position.x = this.position.x - this.healthbar.view.width / 2;
 	this.healthbar.view.position.y = this.position.y - this.height / 2 - this.healthbar.view.height;
-}
-
-GAME.Enemy.prototype.stop = function()
-{
-	this.vx = 0;
-	this.vy = 0;
 }
 
 GAME.Enemy.prototype.moveUp = function()
@@ -144,49 +137,15 @@ GAME.Enemy.prototype.moveDownRight = function()
 	this.vx = this.speed * GAME.ROOTTWOOVERTWO;
 }
 
-GAME.Enemy.prototype.spawnDamageText = function (text, duration, color) 
-{
-	var style = new PIXI.TextStyle({
-		fontFamily: 'Arial',
-		fontSize: 14,
-		fontStyle: 'normal',
-		fontWeight: 'normal',
-		fill: ['#ffffff', color],
-		stroke: '#4a1850',
-		strokeThickness: 2
-	});
-
-	var textSprite = new PIXI.Text(text, style);
-	textSprite.updateText();
-	
-	this.damageTime = 0;
-	this.damageTextDuration = duration;
-	this.damageText = new PIXI.Sprite(textSprite.texture);
-	this.damageText.position.x = this.position.x;
-	this.damageText.position.y = this.position.y - this.bounds.height;
-	
-	// tween x value
-	this.damageText.moveX = 0;
-	TweenLite.to(this.damageText, duration, {
-		moveX : 1.4,
-		Ease: Power2.EaseIn
-	});
-	TweenLite.to(this.damageText, duration * 0.5, {
-		alpha : 0,
-		delay : duration * 0.5
-	});
-	
-	GAME.level.engine.view.gameScene.addChild(this.damageText);
-}
-
 GAME.Enemy.prototype.getHit = function(damage)
 {
 	if (this.dying || !this.alive) return;
 	
+	console.log(damage);
+	
 	if (!this.isHit) {
 		GAME.audio.playSound('slashed_1', 0.2);
-		this.spawnDamageText(damage.toString(), 0.75, 0xFFFF00);
-		console.log("DAMAGE TEXT SPAWNED");
+		GAME.level.engine.view.spawnDamageText(damage.toString(), 0.75, 14, 0xFFFF00, false, this);
 	}
 
 	if (!this.isHit && this.stunDuration > 0.01) {
@@ -197,10 +156,23 @@ GAME.Enemy.prototype.getHit = function(damage)
 		this.vy = 0;
 		this.healthbar.damage(damage);
 		this.health -= damage;
+		if (this.attacking) {
+			this.attacking = false;
+		}
 		
 		if (this.health <= 0) {
 			this.health = 0;
 		}
+		
+		var monster = this;
+		setTimeout(function () {
+			monster.isHit = false;
+			monster.healthbar.view.alpha = 0.5;
+			
+			if (monster.health <= 0) {
+				monster.die();
+			}
+		}, monster.stunDuration * 1000);
 	} else if (!this.isHit) {
 		this.isHit = true;
 		this.hitTime = 0.0;
@@ -216,7 +188,7 @@ GAME.Enemy.prototype.getHit = function(damage)
 
 GAME.Enemy.prototype.animate = function() 
 {
-	if (this.isHit || this.dying) { 
+	if (this.isHit || this.dying || this.attacking) { 
 		return;
 	}
 
@@ -253,6 +225,7 @@ GAME.Enemy.prototype.animate = function()
 		}
 		
 		if (this.view.textures != newFrames) {
+			this.view.loop = true;
 			this.view.textures = newFrames;
 			this.view.gotoAndPlay(0);
 			this.justStartedAnimation = true;
@@ -263,6 +236,12 @@ GAME.Enemy.prototype.animate = function()
 	}
 }
 
+GAME.Enemy.prototype.stop = function() 
+{
+	this.vx = 0;
+	this.vy = 0;
+}
+
 GAME.Enemy.prototype.changeDirection = function()
 {
 	this.moveFramesLeft = 0;
@@ -270,83 +249,28 @@ GAME.Enemy.prototype.changeDirection = function()
 
 GAME.Enemy.prototype.backout = function()
 {
-	this.position.x = this.previous.x;
-	this.position.y = this.previous.y;
-	
-	this.view.position.x = this.position.x;
-	this.view.position.y = this.position.y;
-	
-	this.bounds.x = this.position.x - this.width / 2;
-	this.bounds.y = this.position.y - this.height / 2;
+	this.setPosition(this.previous.x, this.previous.y);
 }
 
 GAME.Enemy.prototype.move = function(x, y)
 {
-	this.previous.x = this.position.x;
-	this.previous.y = this.position.y;
-
-	this.position.x += x;
-	this.position.y += y;
-	
-	this.view.position.x = this.position.x;
-	this.view.position.y = this.position.y;
-	
-	this.bounds.x = this.position.x - this.width / 2;
-	this.bounds.y = this.position.y - this.height / 2;
-	
-	this.healthbar.view.position.x = this.position.x - this.healthbar.view.width / 2;
-	this.healthbar.view.position.y = this.position.y - this.height / 2 - this.healthbar.view.height;
+	this.setPosition(this.position.x + x, this.position.y + y);
 }
 
 GAME.Enemy.prototype.behave = function() 
 {
 	if (this.isHit || this.dying) return;
-
-	// todo - configure
-	
-	GAME.ai.simpleAggress(this, GAME.player);
+	this.behavior(this);
 }
 
-GAME.Enemy.prototype.updateHit = function()
+GAME.Enemy.prototype.calculateHit = function(entity)
 {
-	if (this.isHit) {
-		this.hitTime += GAME.time.DELTA_TIME;
-		
-		if (this.hitTime > this.stunDuration) {
-			this.isHit = false;
-			this.healthbar.view.alpha = 0.5;
-			
-			if (this.health <= 0) {
-				this.die();
-			}
-		}
-	}
-}
-
-GAME.Enemy.prototype.updateDamageText = function()
-{
-	if (this.isHit && this.damageText && this.damageTime < this.damageTextDuration) {
-		this.damageTime += GAME.time.DELTA_TIME;
-		
-		var ratio = this.damageTime / this.damageTextDuration;
-		
-		var y = 30 * Math.sin(this.damageText.moveX * 2);
-		
-		this.damageText.position.x = this.position.x + (ratio * 20);
-		this.damageText.position.y = this.position.y - this.bounds.height / 2 - this.damageText.height - y;
-		
-		if (this.damageTime >= this.damageTextDuration) {
-			this.damageTextDuration = 0;
-			GAME.level.engine.view.gameScene.removeChild(this.damageText);
-		}
-	}
+	return this.attack - entity.defense;
 }
 
 GAME.Enemy.prototype.die = function()
 {
 	this.dying = true;
-	
-	var monster = this;
 	
 	GAME.audio.playSound('monster_death_1', 0.2);
 	
@@ -358,6 +282,7 @@ GAME.Enemy.prototype.die = function()
 	this.view.width = this.view.width * (this.width / GAME.MONSTER_DEATH_BASE_WIDTH); 
 	this.view.height = this.view.height * (this.height / GAME.MONSTER_DEATH_BASE_HEIGHT);
 	
+	var monster = this;
 	this.view.onComplete = function() {
 		TweenLite.to(monster.view, 1.0, {
 			alpha: 0,
@@ -378,8 +303,6 @@ GAME.Enemy.prototype.update = function()
 		return;
 	}
 
-	this.updateHit();
-	this.updateDamageText();
 	this.behave();
 	this.animate();
 	this.move(this.vx, this.vy);

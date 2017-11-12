@@ -170,12 +170,155 @@ GAME.AIBehavior.prototype.simpleIntercardinalMovement = function (monster)
 	}
 }
 
-
-GAME.AIBehavior.prototype.pathTowardPlayerAStar = function (monster, player, level)
+GAME.AIBehavior.prototype.basicAttackInCardinalRange = function (monster, player)
 {
-	// generate A* if not already done some
+	if (distanceSquared(monster, player) <= monster.range) {
+		monster.basicAttack(directionToward(monster, player));
+	}
+}
+
+GAME.AIBehavior.prototype.nodeThingy = function(traversable, x_index, y_index) 
+{
+	var obj = {};
+  obj.x_index = x_index;
+  obj.y_index = y_index;
+  obj.f_cost = null;
+  obj.g_cost = null;
+  obj.h_cost = null;
+  obj.parent = null;
+	return obj;
+}
+
+GAME.AIBehavior.prototype.findPath = function(monster, player, level) 
+{
+  var rows = level.collisions.length;
+  var cols = level.collisions[0].length;
+  var startRow = Math.floor(monster.bounds.x / level.TW);
+  var startCol = Math.floor(monster.bounds.y / level.TH);
+  var endRow = Math.floor(player.bounds.x / level.TW);
+  var endCol = Math.floor(player.bounds.y / level.TH);
+
+  var openList = new Array();
+  var closedList = new Array();
+
+  startNode = this.nodeThingy(0, startRow, startCol);
 	
-	// adjust based on current positions
-	
-	// change velocity
+  startNode.f_cost = 0;
+  startNode.g_cost = 14 * Math.abs(startRow - endRow) + 10 * Math.abs(startCol - endCol); 
+  startNode.h_cost = startNode.f_cost + startNode.g_cost;
+
+  openList.push(startNode);
+
+  while (true) {
+    // If there just isn't any path return
+    if (openList.length == 0) {
+      return;
+    }
+
+    // Set "current" as the node in openList with lowest F score
+    var low_index = 0;
+    var h_low = 1000000;
+		var g_low = 1000000;
+
+    for (var i = 0; i < openList.length; i++) {
+      if (openList[i].h_cost <= h_low && openList[i].g_cost < g_low) {
+        low_index = i;
+				g_low = openList[i].g_cost;
+				h_low = openList[i].h_cost;
+      }
+    }
+		
+    current = openList[low_index];
+    closedList.push(current); 
+    openList.splice(low_index, 1);
+
+		// This node has parents that link all the way back
+    if (current.x_index == endRow && current.y_index == endCol) {
+      return current;
+    }
+
+    // UP                                            
+    if (current.y_index < (cols - 1) && !(level.collisions[current.x_index][current.y_index + 1] == 1)) {
+      newNode = this.nodeThingy(0, current.x_index, current.y_index + 1);
+			
+			var closed = false;
+      for (var i = 0; i < closedList.length; i++) {
+        if (closedList[i].x_index == newNode.x_index && closedList[i].y_index == newNode.y_index) {
+          closed = true;
+					break;
+        }
+      }
+			
+			if (!closed) {
+				newNode.f_cost = 14 * Math.abs(startRow - newNode.x_index) + 10 * Math.abs(startCol - newNode.y_index); 
+				newNode.g_cost = 14 * Math.abs(endRow - newNode.x_index) + 10 * Math.abs(endCol - newNode.y_index); 
+				newNode.h_cost = newNode.f_cost + newNode.g_cost; 
+				newNode.parent = current; 
+				openList.push(newNode);
+			}
+    }
+
+    // RIGHT
+    if (current.x_index < (rows - 1) && !(level.collisions[current.x_index + 1][current.y_index] == 1)) {
+      newNode = this.nodeThingy(0, current.x_index + 1, current.y_index);
+			
+			var closed = false;
+      for (var i = 0; i < closedList.length; i++) {
+        if (closedList[i].x_index == newNode.x_index && closedList[i].y_index == newNode.y_index) {
+          closed = true;
+					break;
+        }
+      }
+			
+			if (!closed) {
+				newNode.f_cost = 14 * Math.abs(startRow - newNode.x_index) + 10 * Math.abs(startCol - newNode.y_index);
+				newNode.g_cost = 14 * Math.abs(endRow - newNode.x_index) + 10 * Math.abs(endCol - newNode.y_index);
+				newNode.h_cost = newNode.f_cost + newNode.g_cost;
+				newNode.parent = current;
+				openList.push(newNode);
+			}
+    }
+
+    // DOWN
+    if (current.y_index > 0 && !(level.collisions[current.x_index][current.y_index - 1] == 1)) {
+      newNode = this.nodeThingy(0, current.x_index, current.y_index - 1);
+			
+			var closed = false;
+      for (var i = 0; i < closedList.length; i++) {
+        if (closedList[i].x_index == newNode.x_index && closedList[i].y_index == newNode.y_index) {
+          closed = true;
+					break;
+        }
+      }
+			
+			if (!closed) {
+				newNode.f_cost = 14 * Math.abs(startRow - newNode.x_index) + 10 * Math.abs(startCol - newNode.y_index);
+				newNode.g_cost = 14 * Math.abs(endRow - newNode.x_index) + 10 * Math.abs(endCol - newNode.y_index);
+				newNode.h_cost = newNode.f_cost + newNode.g_cost;
+				newNode.parent = current;
+				openList.push(newNode);
+			}
+    }
+
+    // LEFT
+    if (current.x_index > 0 && !(level.collisions[current.x_index - 1][current.y_index] == 1)) {
+      newNode = this.nodeThingy(0, current.x_index - 1, current.y_index);
+			
+			var closed = false;
+      for (var i = 0; i < closedList.length; i++) {
+        if (closedList[i].x_index == newNode.x_index && closedList[i].y_index == newNode.y_index) {
+					closed = true;
+					break;
+        }
+      }
+			
+			if (!closed) {
+				newNode.f_cost = 14 * Math.abs(startRow - newNode.x_index) + 10 * Math.abs(startCol - newNode.y_index);
+				newNode.g_cost = 14 * Math.abs(endRow - newNode.x_index) + 10 * Math.abs(endCol - newNode.y_index);
+				newNode.h_cost = newNode.f_cost + newNode.g_cost;
+				newNode.parent = current;
+				openList.push(newNode);
+			}
+    }
+  }
 }
