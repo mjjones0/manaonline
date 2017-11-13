@@ -6,6 +6,7 @@ var Container 			= PIXI.Container,
     Sprite 				= PIXI.Sprite;
 
 var isMobile = false;
+var gamepadOn = false;
 var game;
 
 document.addEventListener("DOMContentLoaded", function(event) { 
@@ -29,6 +30,8 @@ function load() {
 		"img/keyboard_x.png",
 		"img/keyboard_z_pressed.png",
 		"img/keyboard_x_pressed.png",
+		"img/controller_a.png",
+		"img/controller_x.png",
 		"img/attack_icon.png",
 		"img/monster_death.json",
 		"img/foreground_forest_1.png",
@@ -86,6 +89,7 @@ function resize()
 }
 
 function gameLoop() {
+
 	check_gamepad();
     requestAnimationFrame(gameLoop);
 	

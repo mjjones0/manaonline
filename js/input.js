@@ -19,8 +19,8 @@ var OnScreenRun;
 var OnScreenAttack;
 var OnScreenZ;
 var OnScreenX;
-
-var gamepadOn = false;
+var ControllerA;
+var ControllerX;
 
 GAME.Input = function()
 {
@@ -30,6 +30,7 @@ GAME.Input = function()
 		setup_buttons();
 	} else {
 		setup_keyboard_buttons();
+		setup_gamepad_buttons();
 	}
 }
 
@@ -231,15 +232,26 @@ function setup_keyboard_buttons() {
 	OnScreenX.y = GAME.BASEHEIGHT - OnScreenX.height - 6;
 }
 
+function setup_gamepad_buttons(){
+
+	ControllerA = new PIXI.Sprite(resources["img/controller_a.png"].texture);
+	ControllerA.x = 6;
+	ControllerA.y = GAME.BASEHEIGHT - OnScreenZ.height - 6;
+
+	ControllerX = new PIXI.Sprite(resources["img/controller_x.png"].texture);
+	ControllerX.x = 6 + 2 + OnScreenZ.width;
+	ControllerX.y = GAME.BASEHEIGHT - OnScreenX.height - 6;
+}
+
 function check_gamepad(){
 	var gp = navigator.getGamepads()[0];
 	if(!gamepadOn){
-		if(!gp) return;
+		if(!gp) return false;
 		if(gp.axes[0] > 0.5 || gp.axes[0] < -0.5 || gp.axes[1] > 0.5 || gp.axes[1] < -0.5 ){
 			gamepadOn = true;
 		}
 		if(!gamepadOn){
-			return;
+			return false;
 		}
 	}
     var axeLR = gp.axes[0];
@@ -276,6 +288,6 @@ function check_gamepad(){
     if(gpbZ.pressed){
     	zPressed = true;
     }
-
+	return true;
 }
 
