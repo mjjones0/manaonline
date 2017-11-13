@@ -6,7 +6,10 @@ var Container 			= PIXI.Container,
     Sprite 				= PIXI.Sprite;
 
 var isMobile = false;
-var gamepadOn = false;
+var gamepad = {
+	"on" : false,
+	"updateHud" : false
+}
 var game;
 
 document.addEventListener("DOMContentLoaded", function(event) { 
@@ -89,7 +92,7 @@ function resize()
 }
 
 function gameLoop() {
-	
+
     requestAnimationFrame(gameLoop);
 	
     game.update();

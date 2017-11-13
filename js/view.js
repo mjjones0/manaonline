@@ -42,7 +42,7 @@ GAME.View.prototype.clearScene = function()
 		this.hud.removeChild(OnScreenRun);
 		this.hud.removeChild(OnScreenAttack);
 		this.hud.interactive = false;
-	} else if(gamepadOn){
+	} else if(gamepad.on){
 		this.hud.removeChild(ControllerA);
 		this.hud.removeChild(ControllerX);
 	} else {
@@ -54,12 +54,26 @@ GAME.View.prototype.clearScene = function()
 
 GAME.View.prototype.updateHudGamepad = function()
 {
-	if(gamepadOn){
-		this.hud.removeChild(OnScreenZ);
-		this.hud.removeChild(OnScreenX);
+	if(gamepad.updateHud){
 
-		this.hud.addChild(ControllerA);
-		this.hud.addChild(ControllerX);
+		//Controller active
+		if(gamepad.on){
+			this.hud.removeChild(OnScreenZ);
+			this.hud.removeChild(OnScreenX);
+
+			this.hud.addChild(ControllerA);
+			this.hud.addChild(ControllerX);
+		}
+		//Controller disconnected
+		else{
+			this.hud.addChild(OnScreenZ);
+			this.hud.addChild(OnScreenX);
+
+			this.hud.removeChild(ControllerA);
+			this.hud.removeChild(ControllerX);
+		}
+
+		gamepad.updateHud = false;
 	}
 }
 
@@ -86,7 +100,7 @@ GAME.View.prototype.createScene = function()
 		this.hud.addChild(OnScreenRun);
 		this.hud.addChild(OnScreenAttack);
 		this.hud.interactive = true;
-	} else if(gamepadOn){
+	} else if(gamepad.on){
 		this.hud.addChild(ControllerA);
 		this.hud.addChild(ControllerX);
 	} else {

@@ -32,6 +32,8 @@ GAME.Input = function()
 		setup_keyboard_buttons();
 		setup_gamepad_buttons();
 	}
+
+	window.addEventListener("gamepaddisconnected", gamepad_disconnected_handler);
 }
 
 GAME.Input.constructor = GAME.Input;
@@ -245,12 +247,13 @@ function setup_gamepad_buttons(){
 
 function check_gamepad(){
 	var gp = navigator.getGamepads()[0];
-	if(!gamepadOn){
+	if(!gamepad.on){
 		if(!gp) return false;
 		if(gp.axes[0] > 0.5 || gp.axes[0] < -0.5 || gp.axes[1] > 0.5 || gp.axes[1] < -0.5 ){
-			gamepadOn = true;
+			gamepad.on = true;
+			gamepad.updateHud = true;
 		}
-		if(!gamepadOn){
+		if(!gamepad.on){
 			return false;
 		}
 	}
@@ -289,6 +292,21 @@ function check_gamepad(){
     	zPressed = true;
     }
 	return true;
+}
+
+function gamepad_disconnected_handler(){
+	if(gamepad.on){
+
+		gamepad.on = false;
+		gamepad.updateHud = true;
+
+    	up.release();
+		left.release();
+		down.release();
+		right.release();
+		x_button.release();
+		z_button.release();
+	}
 }
 
 GAME.Input.prototype.update = function(){
