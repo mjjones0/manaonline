@@ -29,6 +29,7 @@ GAME.Engine.prototype.update = function()
 {
 	GAME.time.update();
 	GAME.level.update();
+	GAME.input.update();
 	
 	this.view.update();
 }

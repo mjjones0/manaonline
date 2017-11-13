@@ -291,3 +291,6 @@ function check_gamepad(){
 	return true;
 }
 
+GAME.Input.prototype.update = function(){
+	check_gamepad();
+}
