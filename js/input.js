@@ -130,10 +130,12 @@ function setup_inputs() {
 		OnScreenZ.texture = resources["img/keyboard_z.png"].texture;
 	}
 	x_button.press = function () { 
+		console.log("X press");
 		xPressed = true; 
 		OnScreenX.texture = resources["img/keyboard_x_pressed.png"].texture;
 	}
-	x_button.release = function () { 
+	x_button.release = function () {
+		console.log("X release"); 
 		xPressed = false; 
 		OnScreenX.texture = resources["img/keyboard_x.png"].texture;
 	}
@@ -259,38 +261,71 @@ function check_gamepad(){
 	}
     var axeLR = gp.axes[0];
     var axeUD = gp.axes[1];
-    var gpbZ = gp.buttons[0];
-    var gpbX = gp.buttons[2];
+    var currentZ = gp.buttons[0];
+    var currentX = gp.buttons[2];
 
-    	up.release();
-		left.release();
-		down.release();
-		right.release();
-		x_button.release();
-		z_button.release();
-		xPressed = false;
-		zPressed = false;
+
 
     if(axeLR < -0.5) {
-        left.press();
+		if( !(gamepad.axeLR < -0.5) ){
+			left.press();
+		}
+		
     }
-    if(axeLR > 0.5) {
-    	right.press();
-    }
+    else if(axeLR > 0.5) {
+		if( !(gamepad.axeLR > 0.5) ){
+			right.press();
+		}
+
+	}
+	else{
+		if( gamepad.axeLR < -0.5 || gamepad.axeLR > 0.5){
+			left.release();
+			right.release();
+		}
+	}
 
     if(axeUD < -0.5) {
-        up.press();
+		if( !(gamepad.axeUD < -0.5) ){
+			up.press();
+		}
     }
-    if(axeUD > 0.5) {
-    	down.press();
-    }
+    else if(axeUD > 0.5) {
+		if( !(gamepad.axeUD < -0.5) ){
+			down.press();
+		}
+	}
+	else{
+		if( gamepad.axeUD < -0.5 || gamepad.axeUD > 0.5){
+			up.release();
+			down.release();
+		}
+	}
 
-    if(gpbX.pressed){
-    	xPressed = true;
-    }
-    if(gpbZ.pressed){
-    	zPressed = true;
-    }
+    if(currentX.pressed){
+		if( !gamepad.previousX){
+			x_button.press();
+		}
+	}
+	else if (gamepad.previousX){
+		x_button.release();
+	}
+
+    if(currentZ.pressed){
+		if( !gamepad.previousZ){
+			z_button.press();
+		}
+	}
+	else if (gamepad.previousZ){
+		z_button.release();
+	}
+	
+	//update gamepad state
+	gamepad.axeLR = axeLR;
+	gamepad.axeUD = axeUD;
+	gamepad.previousX = currentX.pressed;
+	gamepad.previousZ = currentZ.pressed;
+
 	return true;
 }
 

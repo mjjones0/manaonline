@@ -8,7 +8,11 @@ var Container 			= PIXI.Container,
 var isMobile = false;
 var gamepad = {
 	"on" : false,
-	"updateHud" : false
+	"updateHud" : false,
+	"axeLR" : 0,
+	"axeUD" : 0,
+	"previousX" : false,
+	"previousZ" : false
 }
 var game;
 
