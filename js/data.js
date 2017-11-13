@@ -28,7 +28,8 @@ GAME.PER_LEVEL =
 	HEALTH: 10
 }
 
-GAME.SONGS = ['path', 'dungeon', 'boss'];
+GAME.SONGS = ['path', 'dungeon', 'boss', 'powell'];
+GAME.OBJECTS = ['img/bush.png', 'img/dark_gem.png', 'img/green_gem.png', 'img/cat.png'];
 
 GAME.PLAYER_BASE =
 {
@@ -50,6 +51,8 @@ GAME.PLAYER_BASE =
 	TILE_OFFSET_Y: 0,
 	ATTACK_COOLDOWN: 1,
 	SLASH_HITBOX_SIZE: 30,
+	STUN_DURATION: 0.25,
+	INVINCIBILITY_DURATION: 1.0,
 	ITEMS: []
 };
 	
@@ -61,12 +64,11 @@ GAME.MONSTERS['rabite'] =
 	AGGRESSIVE: false,
 	HEAVY: false,
 	SPEED: 0.75,
-	ATTACK: 0,
+	ATTACK: 7,
 	DEFENSE: 1,
 	WIDTH: 22,
 	HEIGHT: 22,
-	HIT_FRAMES: 2,
-	MOVE_FRAMES: 7,
+	RANGE: 30,
 	STUN_DURATION: 1,
 	LOOT: [
 		{
@@ -96,6 +98,50 @@ GAME.MONSTERS['rabite'] =
 		still_down : ['rabite_attack_2'],
 		still_left : ['rabite_attack_8'],
 		still_up : ['rabite_attack_5'],
+		death : ['monster_death_0', 'monster_death_1', 'monster_death_2', 
+			   'monster_death_3', 'monster_death_4', 'monster_death_5', 'monster_death_6'],
+	},
+	FRAME_DEFAULT: 'move_down',
+};
+
+GAME.MONSTERS['lazy_dragon'] = 
+{
+	NAME: "lazy dragon",
+	HEALTH: 40,
+	EXP: 10,
+	AGGRESSIVE: true,
+	HEAVY: true,
+	SPEED: 0.5,
+	ATTACK: 5,
+	DEFENSE: 2,
+	WIDTH: 16,
+	HEIGHT: 25,
+	STUN_DURATION: 0.5,
+	RANGE: 40,
+	BASIC_ATTACK_COOLDOWN: 1.0,
+	LOOT: [
+		{
+			TYPE: GAME.BERRY,
+			RATE: 0.05,
+			QTY: 1
+		},
+		{
+			TYPE: GAME.LIGHT_CRYSTAL,
+			RATE: 1,
+			QTY: 1
+		}
+	],
+	FRAMES: {
+		attack_down : ['lazy_dragon_attack_down_0', 'lazy_dragon_attack_down_1', 'lazy_dragon_attack_down_2'],
+		attack_left : ['lazy_dragon_attack_left_0', 'lazy_dragon_attack_left_1', 'lazy_dragon_attack_left_2'],
+		attack_up : ['lazy_dragon_attack_up_0', 'lazy_dragon_attack_up_1', 'lazy_dragon_attack_up_2'],
+		hit : ['lazy_dragon_hit_0', 'lazy_dragon_hit_1'],
+		move_down : ['lazy_dragon_move_down_0', 'lazy_dragon_move_down_1', 'lazy_dragon_move_down_2'],
+		move_left : ['lazy_dragon_move_left_0', 'lazy_dragon_move_left_1', 'lazy_dragon_move_left_2'],
+		move_up : ['lazy_dragon_move_up_0', 'lazy_dragon_move_up_1', 'lazy_dragon_move_up_2'],
+		still_down : ['lazy_dragon_still_down_0'],
+		still_left : ['lazy_dragon_still_left_0'],
+		still_up : ['lazy_dragon_move_up_0'],
 		death : ['monster_death_0', 'monster_death_1', 'monster_death_2', 
 			   'monster_death_3', 'monster_death_4', 'monster_death_5', 'monster_death_6'],
 	},
@@ -160,7 +206,7 @@ GAME.LEVELS['demo_room_0'] =
 	BG_WIDTH: 800,
 	BG_HEIGHT: 600,
 	SONG: "path",
-	TITLE: "Demo Room 0"
+	NAME: "Demo Room 0"
 }
 
 GAME.LEVELS['demo_room_1'] = 
@@ -267,12 +313,11 @@ GAME.LEVELS['demo_room_1'] =
 	BG_WIDTH: 800,
 	BG_HEIGHT: 600,
 	SONG: "path",
-	TITLE: "Demo Room 1"
+	NAME: "Demo Room 1"
 }
 
 GAME.LEVELS['forest_coast'] = 
 {
-    "ID": "forest_coast",
     "NAME": "Forest Coast",
     "SONG": "powell",
     "FOREGROUND": "img/foreground_forest_0.png",
@@ -320,7 +365,6 @@ GAME.LEVELS['forest_coast'] =
 
 GAME.LEVELS['forest_riverways'] = 
 {
-    "ID": "forest_riverways",
     "NAME": "Forest Riverways",
     "SONG": "powell",
     "FOREGROUND": "img/foreground_forest_1.png",
@@ -329,8 +373,8 @@ GAME.LEVELS['forest_riverways'] =
     "TH": 20,
     "ROWS": 20,
     "COLS": 20,
-	"BG_WIDTH" : 400,
-	"BG_HEIGHT" : 398,
+		"BG_WIDTH" : 400,
+		"BG_HEIGHT" : 398,
     "COLLISIONS": [
         [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
@@ -361,25 +405,83 @@ GAME.LEVELS['forest_riverways'] =
         "DEST_X": 32,
         "DEST_Y": 90,
         "TEXTURE": "img/exit.png"
-    }, 
-	//{
-    //    "X": 187,
-    //    "Y": 10.613333333333333,
-    //    "TYPE": 0,
-    //    "NEXT": "",
-    //    "DEST_X": 0,
-    //    "DEST_Y": 0,
-    //    "TEXTURE": "img/exit.png"
-    //}, 
-	{
+    },
+		{
+        "X": 188,
+        "Y": 8,
+        "TYPE": 0,
+        "NEXT": "forest_statue",
+        "DEST_X": 208,
+        "DEST_Y": 244,
+        "TEXTURE": "img/exit.png"
+    },	
+		{
         "X": 98,
         "Y": 130,
         "TYPE": GAME.MONSTER,
-        "ID": "rabite"
+        "ID": "rabite",
+				"AGGRESSIVE" : false
     }, {
         "X": 153,
         "Y": 85,
         "TYPE": GAME.MONSTER,
-        "ID": "rabite"
+        "ID": "rabite",
+				"AGGRESSIVE" : false
     }]
+}
+
+GAME.LEVELS['forest_statue'] =
+{
+    "NAME": "Forest Statue",
+    "SONG": "powell",
+    "FOREGROUND": "img/foreground_forest_statue.png",
+    "BACKGROUND": "img/background_forest_statue.png",
+    "TW": 12,
+    "TH": 12,
+    "ROWS": 25,
+    "COLS": 51,
+    "COLLISIONS": [
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    ],
+    "ENTITIES": [{
+        "X": 208,
+        "Y": 274,
+        "TYPE": 0,
+        "NEXT": "forest_riverways",
+        "DEST_X": 188,
+        "DEST_Y": 38,
+        "TEXTURE": "img/exit.png"
+    }, {
+        "X": 248,
+        "Y": 159,
+        "TYPE": 3,
+        "ID": "rabite",
+				"AGGRESSIVE" : true
+    }],
+    "BG_WIDTH": 605,
+    "BG_HEIGHT": 300
 }

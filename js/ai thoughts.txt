@@ -1,0 +1,13 @@
+// Decide to move toward player
+
+// do movement
+
+// decide again after
+
+// do another movement
+
+// etc
+
+// they are locked into one another
+
+// there's move lateral and move toward

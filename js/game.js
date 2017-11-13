@@ -34,7 +34,11 @@ function load() {
 		"img/foreground_forest_1.png",
 		"img/foreground_forest_0.png",
 		"img/background_forest_1.png",
-		"img/background_forest_0.png"
+		"img/background_forest_0.png",
+		"img/foreground_forest_statue.png",
+		"img/background_forest_statue.png",
+		"img/passive_aura.png",
+		"img/lazy_dragon.json"
 	  ])
 	  .load(init);
 }
@@ -61,7 +65,7 @@ function init() {
 	};
 	
 	game.start();
-    gameLoop();
+  gameLoop();
 }
 
 function resize() 

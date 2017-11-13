@@ -10,8 +10,8 @@ GAME.View = function(engine)
 	GAME.fade.height = GAME.BASEHEIGHT;
 	
 	this.stage = new Container();
-    this.hud = new Container();
-    this.gameScene = new Container();
+  this.hud = new Container();
+  this.gameScene = new Container();
 	
 	this.stage.addChild(this.gameScene);
 	this.stage.addChild(this.hud);
@@ -47,36 +47,6 @@ GAME.View.prototype.clearScene = function()
 		this.hud.removeChild(OnScreenX);
 	}
 }
-
-GAME.View.prototype.arcingText = function(text, startPosition, endPosition, durationInFrames, color) 
-{
-	var style = new PIXI.TextStyle({
-		fontFamily: 'Arial',
-		fontSize: 12,
-		fontStyle: 'normal',
-		fontWeight: 'normal',
-		fill: ['#ffffff', color],
-		stroke: '#4a1850',
-		strokeThickness: 2
-	});
-
-	var textSprite = new PIXI.Text(text, style);
-	textSprite.position.x = startPosition.x;
-	textSprite.position.y = startPosition.y;
-	
-	this.gameScene.addChild(textSprite);
-	var gameScene = this.gameScene;
-	
-	TweenLite.to(textSprite.position, durationInFrames, {
-		x : endPosition.x,
-		y : endPosition.y,
-		ease : Cubic.EaseOut,
-		useFrames : true,
-		onComplete : function () {
-			gameScene.removeChild(textSprite);
-		}
-	});
-} 
 
 GAME.View.prototype.createScene = function()
 {
@@ -161,4 +131,53 @@ GAME.View.prototype.update = function()
 	this.moveCamera();
 
 	this.renderer.render(this.stage);
+}
+
+GAME.View.prototype.spawnDamageText = function(text, duration, size, color, left, entity)
+{
+	var style = new PIXI.TextStyle({
+			fontFamily: 'Arial',
+			fontSize: size,
+			fontStyle: 'normal',
+			fontWeight: 'normal',
+			fill: ['#ffffff', color],
+			stroke: '#4a1850',
+			strokeThickness: 2
+	});
+
+	var textSprite = new PIXI.Text(text, style);
+	textSprite.updateText();
+	
+	var damageText = new PIXI.Sprite(textSprite.texture);
+  damageText.position.x = entity.position.x;
+	damageText.position.y = entity.position.y - entity.bounds.height;
+	
+	var gameScene = this.gameScene;
+	gameScene.addChild(damageText);
+	
+	// tween the damage text
+	damageText.moveX = 0;
+	TweenLite.to(damageText, duration, {
+		moveX : 1.4,
+		Ease: Power2.EaseIn,
+		onStart : function () {
+			this.time = 0.0;
+		},
+		onUpdate : function () {
+			this.time += 0.0167;
+			var ratio = this.time / duration;
+			var y = 30 * Math.sin(damageText.moveX * 2);
+			damageText.position.x = entity.position.x + (left ? -(ratio * 20) : (ratio * 20));
+			damageText.position.y = entity.position.y - entity.bounds.height / 2 - damageText.height - y;
+		},
+		onComplete : function () {
+			gameScene.removeChild(damageText);
+		}
+	});
+	
+	// tween alpha of the text
+	TweenLite.to(damageText, duration * 0.5, {
+		alpha : 0,
+		delay : duration * 0.5,
+	});
 }

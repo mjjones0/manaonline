@@ -14,6 +14,13 @@ GAME.Player = function ()
 	this.onCooldown = false;
 	this.health = GAME.PLAYER_BASE.HEALTH;
 	this.attack = GAME.PLAYER_BASE.ATTACK;
+	this.defense = GAME.PLAYER_BASE.DEFENSE;
+	this.stunDuration = GAME.PLAYER_BASE.STUN_DURATION;
+	
+	this.isHit = false;
+	this.hitTime = 0.0;
+	this.dying = false;
+	this.alive = true;
 	
 	this.inventory = {};
 	this.bounds = {};
@@ -140,6 +147,11 @@ GAME.Player = function ()
 		PIXI.Texture.fromFrame('attack_42.png'),
 		PIXI.Texture.fromFrame('attack_43.png')
 	];
+	this.frames['death'] = [
+		PIXI.Texture.fromFrame('knockdown_0.png'),
+		PIXI.Texture.fromFrame('knockdown_1.png'),
+		PIXI.Texture.fromFrame('knockdown_2.png')
+	];
 	
 	this.frames['still_down'] = [ PIXI.Texture.fromFrame('still_0.png') ];
 	this.frames['still_right'] = [ PIXI.Texture.fromFrame('still_1.png') ];
@@ -173,15 +185,6 @@ GAME.Player = function ()
 
 GAME.Player.constructor = GAME.Player;
 
-GAME.Player.prototype.reset = function(x, y)
-{
-	this.position.x = 0;
-	this.position.y = 0;
-    this.vx = 0;
-    this.vy = 0;
-	this.move(x - this.width / 2, y - this.height / 2);
-}
-
 GAME.Player.prototype.setPosition = function(x, y)
 {
 	this.previous.x = this.position.x;
@@ -203,6 +206,21 @@ GAME.Player.prototype.setPosition = function(x, y)
 	
 	this.tileBounds.x = this.position.x + GAME.PLAYER_BASE.TILE_OFFSET_X;
 	this.tileBounds.y = this.position.y + GAME.PLAYER_BASE.TILE_OFFSET_Y;
+}
+
+GAME.Player.prototype.reset = function() 
+{
+	this.alive = true;
+	this.dying = false;
+	this.health = GAME.PLAYER_BASE.HEALTH;
+	this.healthbar.setMax(GAME.PLAYER_BASE.HEALTH);
+	this.healthbar.setCurrent(this.health);
+	
+	TweenLite.to(this.view, 0.5, {
+		alpha: 1
+	});
+	this.view.textures = this.frames['walk_down'];
+	this.view.animationSpeed = 0.15;
 }
 
 GAME.Player.prototype.facingRight = function() 
@@ -239,6 +257,10 @@ GAME.Player.prototype.facingDown = function()
 
 GAME.Player.prototype.animate = function() 
 {
+	if (this.isHit || this.dying) { 
+		return;
+	}
+
 	if (this.vx < 0.01 && this.vy < 0.01 && this.vx > -0.01 && this.vy > -0.01 && !this.attacking) {
 		this.view.stop();
 		
@@ -431,47 +453,91 @@ GAME.Player.prototype.update = function()
 	this.animate();
 }
 
+GAME.Player.prototype.getHit = function(damage)
+{
+	if (this.dying || !this.alive) return;
+	
+	if (!this.isHit) {
+		GAME.audio.playSound('hit_1', 0.2);
+		GAME.level.engine.view.spawnDamageText(damage.toString(), 0.75, 14, 0xFFFF00, true, this);
+	}
+
+	if (!this.isHit && this.stunDuration > 0.01) {
+		this.isHit = true;
+		this.vx = 0;
+		this.vy = 0;
+		this.healthbar.damage(damage);
+		this.health -= damage;
+		if (this.attacking) {
+			this.attacking = false;
+		}
+		
+		if (this.health <= 0) {
+			this.health = 0;
+		}
+		
+		var entity = this;
+		setTimeout(function () {
+			entity.isHit = false;
+			entity.healthbar.view.alpha = 0.5;
+			
+			if (entity.health <= 0) {
+				entity.die();
+			}
+		}, entity.stunDuration * 1000);
+	} else if (!this.isHit) {
+		this.isHit = true;
+		this.hitTime = 0.0;
+		
+		this.healthbar.damage(damage);
+		this.health -= damage;
+		
+		if (this.health <= 0) {
+			this.health = 0;
+		}
+	}
+}
+
 GAME.Player.prototype.backout = function()
 {
-	this.position.x = this.previous.x;
-	this.position.y = this.previous.y;
-	
-	this.view.position.x = this.position.x;
-	this.view.position.y = this.position.y;
-	
-	this.bounds.x = this.position.x - this.width / 2;
-	this.bounds.y = this.position.y - this.height / 2; 
-	
-	this.tileBounds.x = this.position.x + GAME.PLAYER_BASE.TILE_OFFSET_X;
-	this.tileBounds.y = this.position.y + GAME.PLAYER_BASE.TILE_OFFSET_Y;
+	this.setPosition(this.previous.x, this.previous.y);
 }
 
 GAME.Player.prototype.move = function(x, y)
 {
-	this.previous.x = this.position.x;
-	this.previous.y = this.position.y;
-
-	this.position.x += x;
-	this.position.y += y;
-	
-	this.view.position.x = this.position.x;
-	this.view.position.y = this.position.y;
-	
-	this.bounds.x = this.position.x - this.width / 2;
-	this.bounds.y = this.position.y - this.height / 2;
-	
-	this.adjustSlashBounds();
-	
-	this.healthbar.view.position.x = this.position.x - this.healthbar.view.width / 2;
-	this.healthbar.view.position.y = this.position.y - this.height / 2 - this.healthbar.view.height;
-	
-	this.tileBounds.x = this.position.x + GAME.PLAYER_BASE.TILE_OFFSET_X;
-	this.tileBounds.y = this.position.y + GAME.PLAYER_BASE.TILE_OFFSET_Y;
+	this.setPosition(this.position.x + x, this.position.y + y);
 }
 
 GAME.Player.prototype.calculateHit = function(monster)
 {
 	return this.attack - monster.defense;
+}
+
+GAME.Player.prototype.die = function()
+{
+	this.dying = true;
+	
+	GAME.audio.playSound('hit_1', 0.4);
+	
+	this.healthbar.view.alpha = 0;
+	
+	this.view.loop = false;
+	this.view.textures = this.frames['death'];
+	this.view.animationSpeed = 0.20;
+	
+	var entity = this;
+	this.view.onComplete = function() {
+		TweenLite.to(entity.view, 1.0, {
+			alpha: 0,
+			onComplete: function() {
+				entity.alive = false;
+				entity.movementDisabled = true;
+				GAME.level.engine.gameOver();
+			}
+		});
+	}
+	
+	this.view.gotoAndPlay(0);
 }
 
 GAME.Player.prototype.middleOfSlash = function()
@@ -481,6 +547,8 @@ GAME.Player.prototype.middleOfSlash = function()
 
 GAME.Player.prototype.adjustSlashBounds = function() 
 {
+	if (this.dying) return;
+
 	if (this.facingRight()) {
 		this.slashBounds.x = this.bounds.x + this.bounds.width, 
 		this.slashBounds.y = this.bounds.y + this.bounds.height / 2 - GAME.PLAYER_BASE.SLASH_HITBOX_SIZE / 2;
