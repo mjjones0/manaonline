@@ -15,8 +15,8 @@ GAME.Level.prototype.load = function(name, spawnX, spawnY)
 	
 	// background
 	this.bg = new Sprite(resources[data.BACKGROUND].texture);
-  this.bg.width = data.BG_WIDTH;
-  this.bg.height = data.BG_HEIGHT;
+  	this.bg.width = data.BG_WIDTH;
+  	this.bg.height = data.BG_HEIGHT;
 	this.width = data.BG_WIDTH;
 	this.height = data.BG_HEIGHT;
 	
@@ -412,6 +412,13 @@ GAME.Level.prototype.collideWithExit = function()
 	};
 }
 
+GAME.Level.prototype.checkDeath = function()
+{
+	if (!GAME.player.alive) {
+		this.engine.gameOver();
+	}
+}
+
 GAME.Level.prototype.update = function()
 {
 	if (this.transitioning) {
@@ -423,4 +430,5 @@ GAME.Level.prototype.update = function()
 	this.moveAndCollidePlayerY();
 	this.moveAndCollideMonsters();
 	this.collideWithExit();
+	this.checkDeath();
 }

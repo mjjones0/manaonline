@@ -10,8 +10,8 @@ GAME.View = function(engine)
 	GAME.fade.height = GAME.BASEHEIGHT;
 	
 	this.stage = new Container();
-  this.hud = new Container();
-  this.gameScene = new Container();
+  	this.hud = new Container();
+  	this.gameScene = new Container();
 	
 	this.stage.addChild(this.gameScene);
 	this.stage.addChild(this.hud);

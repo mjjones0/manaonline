@@ -2,14 +2,10 @@
 
 GAME.Enemy = function(name, aggressive) 
 {
+	GAME.Entity.call(this);
+
 	var data = GAME.MONSTERS[name];
 	if (!data) { alert('no data for monster: ' + name); }
-	
-	this.position = new PIXI.Point();
-	this.previous = new PIXI.Point();
-	
-	this.vx = 0;
-	this.vy = 0;
 	
 	this.isHit = false;
 	this.hitTime = 0.0;
@@ -41,7 +37,7 @@ GAME.Enemy = function(name, aggressive)
 	this.width = data.WIDTH;
 	this.height = data.HEIGHT;
 	
-	this.frames = [];
+	this.frames = {};
 	
 	for (var key in data.FRAMES) {
 		if (data.FRAMES.hasOwnProperty(key)) {
@@ -70,14 +66,11 @@ GAME.Enemy = function(name, aggressive)
 }
 
 GAME.Enemy.constructor = GAME.Enemy;
+GAME.Enemy.prototype = Object.create(GAME.Entity.prototype);
 
 GAME.Enemy.prototype.setPosition = function(x, y)
 {
-	this.previous.x = this.position.x;
-	this.previous.y = this.position.y;
-	
-	this.position.x = x;
-	this.position.y = y;
+	GAME.Entity.prototype.setPosition.call(this, x, y);
 	
 	this.view.position.x = this.position.x;
 	this.view.position.y = this.position.y;
@@ -87,54 +80,6 @@ GAME.Enemy.prototype.setPosition = function(x, y)
 	
 	this.healthbar.view.position.x = this.position.x - this.healthbar.view.width / 2;
 	this.healthbar.view.position.y = this.position.y - this.height / 2 - this.healthbar.view.height;
-}
-
-GAME.Enemy.prototype.moveUp = function()
-{
-	this.vx = 0;
-	this.vy = -this.speed;
-}
-
-GAME.Enemy.prototype.moveRight = function()
-{
-	this.vy = 0;
-	this.vx = this.speed;
-}
-
-GAME.Enemy.prototype.moveDown = function()
-{
-	this.vx = 0;
-	this.vy = this.speed;
-}
-
-GAME.Enemy.prototype.moveLeft = function()
-{
-	this.vy = 0;
-	this.vx = -this.speed;
-}
-
-GAME.Enemy.prototype.moveUpLeft = function()
-{
-	this.vy = -this.speed * GAME.ROOTTWOOVERTWO;
-	this.vx = -this.speed * GAME.ROOTTWOOVERTWO;
-}
-
-GAME.Enemy.prototype.moveUpRight = function()
-{
-	this.vy = -this.speed * GAME.ROOTTWOOVERTWO;
-	this.vx = this.speed * GAME.ROOTTWOOVERTWO;
-}
-
-GAME.Enemy.prototype.moveDownLeft = function()
-{
-	this.vy = this.speed * GAME.ROOTTWOOVERTWO;
-	this.vx = -this.speed * GAME.ROOTTWOOVERTWO;
-}
-
-GAME.Enemy.prototype.moveDownRight = function()
-{
-	this.vy = this.speed * GAME.ROOTTWOOVERTWO;
-	this.vx = this.speed * GAME.ROOTTWOOVERTWO;
 }
 
 GAME.Enemy.prototype.getHit = function(damage)
@@ -236,25 +181,9 @@ GAME.Enemy.prototype.animate = function()
 	}
 }
 
-GAME.Enemy.prototype.stop = function() 
-{
-	this.vx = 0;
-	this.vy = 0;
-}
-
 GAME.Enemy.prototype.changeDirection = function()
 {
 	this.moveFramesLeft = 0;
-}
-
-GAME.Enemy.prototype.backout = function()
-{
-	this.setPosition(this.previous.x, this.previous.y);
-}
-
-GAME.Enemy.prototype.move = function(x, y)
-{
-	this.setPosition(this.position.x + x, this.position.y + y);
 }
 
 GAME.Enemy.prototype.behave = function() 
