@@ -19,6 +19,8 @@ var OnScreenRun;
 var OnScreenAttack;
 var OnScreenZ;
 var OnScreenX;
+var ControllerA;
+var ControllerX;
 
 GAME.Input = function()
 {
@@ -28,7 +30,10 @@ GAME.Input = function()
 		setup_buttons();
 	} else {
 		setup_keyboard_buttons();
+		setup_gamepad_buttons();
 	}
+
+	window.addEventListener("gamepaddisconnected", gamepad_disconnected_handler);
 }
 
 GAME.Input.constructor = GAME.Input;
@@ -125,10 +130,12 @@ function setup_inputs() {
 		OnScreenZ.texture = resources["img/keyboard_z.png"].texture;
 	}
 	x_button.press = function () { 
+		console.log("X press");
 		xPressed = true; 
 		OnScreenX.texture = resources["img/keyboard_x_pressed.png"].texture;
 	}
-	x_button.release = function () { 
+	x_button.release = function () {
+		console.log("X release"); 
 		xPressed = false; 
 		OnScreenX.texture = resources["img/keyboard_x.png"].texture;
 	}
@@ -229,4 +236,114 @@ function setup_keyboard_buttons() {
 	OnScreenX.y = GAME.BASEHEIGHT - OnScreenX.height - 6;
 }
 
+function setup_gamepad_buttons(){
 
+	ControllerA = new PIXI.Sprite(resources["img/controller_a.png"].texture);
+	ControllerA.x = 6;
+	ControllerA.y = GAME.BASEHEIGHT - OnScreenZ.height - 6;
+
+	ControllerX = new PIXI.Sprite(resources["img/controller_x.png"].texture);
+	ControllerX.x = 6 + 2 + OnScreenZ.width;
+	ControllerX.y = GAME.BASEHEIGHT - OnScreenX.height - 6;
+}
+
+function check_gamepad(){
+	var gp = navigator.getGamepads()[0];
+	if(!gamepad.on){
+		if(!gp) return false;
+		if(gp.axes[0] > 0.5 || gp.axes[0] < -0.5 || gp.axes[1] > 0.5 || gp.axes[1] < -0.5 ){
+			gamepad.on = true;
+			gamepad.updateHud = true;
+		}
+		if(!gamepad.on){
+			return false;
+		}
+	}
+    var axeLR = gp.axes[0];
+    var axeUD = gp.axes[1];
+    var currentZ = gp.buttons[0];
+    var currentX = gp.buttons[2];
+
+
+
+    if(axeLR < -0.5) {
+		if( !(gamepad.axeLR < -0.5) ){
+			left.press();
+		}
+		
+    }
+    else if(axeLR > 0.5) {
+		if( !(gamepad.axeLR > 0.5) ){
+			right.press();
+		}
+
+	}
+	else{
+		if( gamepad.axeLR < -0.5 || gamepad.axeLR > 0.5){
+			left.release();
+			right.release();
+		}
+	}
+
+    if(axeUD < -0.5) {
+		if( !(gamepad.axeUD < -0.5) ){
+			up.press();
+		}
+    }
+    else if(axeUD > 0.5) {
+		if( !(gamepad.axeUD < -0.5) ){
+			down.press();
+		}
+	}
+	else{
+		if( gamepad.axeUD < -0.5 || gamepad.axeUD > 0.5){
+			up.release();
+			down.release();
+		}
+	}
+
+    if(currentX.pressed){
+		if( !gamepad.previousX){
+			x_button.press();
+		}
+	}
+	else if (gamepad.previousX){
+		x_button.release();
+	}
+
+    if(currentZ.pressed){
+		if( !gamepad.previousZ){
+			z_button.press();
+		}
+	}
+	else if (gamepad.previousZ){
+		z_button.release();
+	}
+	
+	//update gamepad state
+	gamepad.axeLR = axeLR;
+	gamepad.axeUD = axeUD;
+	gamepad.previousX = currentX.pressed;
+	gamepad.previousZ = currentZ.pressed;
+
+	return true;
+}
+
+function gamepad_disconnected_handler(){
+	if(gamepad.on){
+
+		gamepad.on = false;
+		gamepad.updateHud = true;
+
+    	up.release();
+		left.release();
+		down.release();
+		right.release();
+		x_button.release();
+		z_button.release();
+	}
+}
+
+GAME.Input.prototype.update = function(){
+	check_gamepad();
+}
